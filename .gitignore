@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# Build/output folders (ajuste conforme sua estrutura)
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema e IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Arquivos de ambiente (se usar)
+.env
+.env.*
