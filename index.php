@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
 
-
-<!-- wp head  -->
-<?php wp_head(); ?>
-  
- 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body class="bg-gray-100 text-gray-900">
-  <h1 class = "text-5xl font-bold text-center my-10">Welcome to WP Movies</h1>
-  
-</body>
-</html>
+  <?php get_header(); ?>
+  <h1 class = "text-5xl text-cyan-900 font-bold text-center my-10">Welcome to WP Movies</h1>
+  <?php get_footer( );
