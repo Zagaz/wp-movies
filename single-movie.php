@@ -45,7 +45,7 @@ if (have_posts()) :
                 foreach ($actors_array as $actor_id) {
                     $actor_name = get_the_title($actor_id); // Get actor name by ID
                     if ($actor_name) {
-                        echo  esc_html($actor_name) . ', ';
+                        echo '<a href="' . esc_url(get_permalink($actor_id)) . '">' . esc_html($actor_name) . '</a>, ';
                     }
                 }
               
