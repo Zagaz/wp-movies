@@ -13,9 +13,14 @@ if (have_posts()) :
         
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
+            
 
             <?php if ($poster_url): ?>
-                <img src="<?php echo esc_url($poster_url); ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
+                /<?php 
+           
+                $image_url = 'https://image.tmdb.org/t/p/w500' . $image_path; ?>
+
+                <img src="<?php echo esc_url( $image_url.$poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
             <?php endif; ?>
 
             <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>

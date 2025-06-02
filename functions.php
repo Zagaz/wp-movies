@@ -7,6 +7,8 @@ foreach ($includes as $file) {
   require_once $file;
 }
 
+
+
 // Function that imports a movie and its actors
 function import_movie_with_cast($movie_id)
 {
@@ -33,7 +35,8 @@ function import_movie_with_cast($movie_id)
 
   if (is_wp_error($movie_post_id)) return;
 
-  // Save the release date as a custom field
+  // Save on the custom fields using ACF
+  update_field('tmdb_id', $movie_data['id'], $movie_post_id); // Text
   update_field('release_date', $movie_data['release_date'], $movie_post_id); // Date Picker
   update_field('poster_url', $movie_data['poster_path'], $movie_post_id); // Image URL
   update_field('production_companies', $movie_data['production_companies'], $movie_post_id); // text 
@@ -77,9 +80,7 @@ function import_movie_with_cast($movie_id)
   // Save the cast as a custom field
   update_field('cast', $cast_list, $movie_post_id);
 
-
-  if (empty($cast_data['cast'])) return;
-
+// Actors
   $actor_ids = [];
 
   foreach (array_slice($cast_data['cast'], 0, 5) as $actor) {
@@ -111,6 +112,7 @@ function import_movie_with_cast($movie_id)
   update_field('actors', $actor_ids, $movie_post_id);
 }
 
+
 // Function that fetches upcoming movies and calls the import function
 function import_upcoming_movies_with_cast()
 {
@@ -118,6 +120,8 @@ function import_upcoming_movies_with_cast()
 
   $response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
   $data = json_decode(wp_remote_retrieve_body($response), true);
+
+
 
   if (empty($data['results'])) {
     return;
