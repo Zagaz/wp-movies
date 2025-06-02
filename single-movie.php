@@ -9,6 +9,11 @@ if (have_posts()) :
         $release_date = get_field('release_date');
         $genre        = get_field('genre');
         $overview     = get_field('overview');
+        $production_companies = get_field('production_companies');
+        $original_language = get_field('original_language');
+        $cast = get_field('cast');
+        $actors = get_field('actors');
+        
         ?>
         
         <div class="movie-detail">
@@ -26,30 +31,45 @@ if (have_posts()) :
             <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
             <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
             <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
+            <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
+            <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
+            <p><strong>Cast:</strong></p>
+            <?php echo esc_html($cast). '.'; ?>
+              <p><strong>Actors:</strong></p>
+            <?php 
+        
+            $actors_array = explode(',', trim($actors, '[]'));
+            // Loop through each actor ID and display their name
+            if (!empty($actors_array)) {
+              
+                foreach ($actors_array as $actor_id) {
+                    $actor_name = get_the_title($actor_id); // Get actor name by ID
+                    if ($actor_name) {
+                        echo  esc_html($actor_name) . ', ';
+                    }
+                }
+              
+            } else {
+                echo '<p>No actors found.</p>';
+            }
+       
 
-            <?php
-$trailer_url = get_field('trailer_url');
 
-if ($trailer_url):
-    // Extract YouTube video ID (assumindo que o link é tipo https://www.youtube.com/watch?v=VIDEO_ID)
-    preg_match('/[\\?\\&]v=([^\\?\\&]+)/', $trailer_url, $matches);
-    $video_id = $matches[1] ?? null;
 
-    if ($video_id):
-        ?>
-        <div class="movie-trailer" style="margin-top: 20px;">
-            <h2>Trailer</h2>
-            <iframe width="560" height="315"
-                    src="https://www.youtube.com/embed/<?php echo esc_attr($video_id); ?>"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-            </iframe>
-        </div>
-        <?php
-    endif;
-endif;
-?>
+      
+            
+            
+            
+            ?>
+
+
+           
+        
+        
+
+            
+
+
 
         </div>
 
