@@ -34,11 +34,10 @@ function import_movie_with_cast($movie_id)
   if (is_wp_error($movie_post_id)) return;
 
   // Save the release date as a custom field
-  update_field('release_date', $movie_data['release_date'], $movie_post_id);
-//  update_field('overview', $movie_data['overview'], $movie_post_id);
-  update_field('poster_url', $movie_data['poster_path'], $movie_post_id);
-  update_field('production_companies', $movie_data['production_companies'], $movie_post_id); // array
-  update_field('original_language', $movie_data['original_language'], $movie_post_id);
+  update_field('release_date', $movie_data['release_date'], $movie_post_id); // Date Picker
+  update_field('poster_url', $movie_data['poster_path'], $movie_post_id); // Image URL
+  update_field('production_companies', $movie_data['production_companies'], $movie_post_id); // text 
+  update_field('original_language', $movie_data['original_language'], $movie_post_id); // Text
  
   // Genres
   $genres = [];
@@ -49,8 +48,18 @@ function import_movie_with_cast($movie_id)
   }
   $genres = implode(', ', $genres);
   update_field('genres', $genres, $movie_post_id);
+
+  // Production Companies
+  $production_companies = [];
+  if (!empty($movie_data['production_companies'])) {
+    foreach ($movie_data['production_companies'] as $company) {
+      $production_companies[] = $company['name'];
+    }
+  }
+  $production_companies = implode(', ', $production_companies);
+  update_field('production_companies', $production_companies, $movie_post_id);
  
-  // Fetch the actors (cast)
+  // Cast
   $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
   $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
   $cast_list = [];
