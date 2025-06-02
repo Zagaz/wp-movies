@@ -18,9 +18,7 @@ function import_movie_with_cast($movie_id) {
     if (empty($movie_data['title'])) {
         return;
     }
-    echo '<pre>';
-    //print_r($movie_data);
-    echo '</pre>';
+
     //exit;
 
     // Create the movie post
@@ -37,14 +35,19 @@ function import_movie_with_cast($movie_id) {
     update_field('release_date', $movie_data['release_date'], $movie_post_id);
     update_field('overview', $movie_data['overview'], $movie_post_id);
     update_field('poster_url', $movie_data['poster_path'], $movie_post_id);
-    //update_field('production_companies', $movie_data['production_companies'], $movie_post_id);
-   // update_field('original_language', $movie_data['original_language'], $movie_post_id);
-  // update_field('genres', $movie_data['genres'], $movie_post_id);
+    update_field('production_companies', $movie_data['production_companies'], $movie_post_id); // array
+    update_field('original_language', $movie_data['original_language'], $movie_post_id);
+    update_field('genres', $movie_data['genres'], $movie_post_id); // array 
 
     // Fetch the actors (cast)
     $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
     $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
-    update_field (  'cast', $cast_data['cast'], $movie_post_id);
+        echo '<pre>';
+   var_dump($cast_data['cast'][0]['name']);
+    echo '</pre>';
+
+    // todo 
+    update_field ('actors_list', $cast_data['cast'], $movie_post_id);
 
     if (empty($cast_data['cast'])) return;
 
