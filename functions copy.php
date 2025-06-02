@@ -1,17 +1,19 @@
 <?php 
-// functions.php
+//functions.php
 
-// Dynamically load from /includes
-$includes = glob(__DIR__ . '/includes/*.php');
-foreach ($includes as $file) {
-    require_once $file;
-}
+  // Dinamically  load from /includes  '9facf375ac53c66a77dfa59841360240';
 
-// Function that imports a movie and its actors
+    $includes = glob(__DIR__ . '/includes/*.php');
+    foreach ($includes as $file) {
+        require_once $file;
+    }
+    
+
+// Função que importa um filme e seus atores
 function import_movie_with_cast($movie_id) {
     $api_key = '9facf375ac53c66a77dfa59841360240';
 
-    // Fetch movie details
+    // Busca os detalhes do filme
     $movie_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US");
     $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
 
@@ -19,38 +21,20 @@ function import_movie_with_cast($movie_id) {
         return;
     }
 
-    // Create the movie post
+    // Cria o post do tipo movie
     $movie_post_id = wp_insert_post([
         'post_title'   => $movie_data['title'],
         'post_type'    => 'movie',
         'post_status'  => 'publish',
-        
-        
-      ]);
-      
-      
-              /**
-               Movie title
-      ○ Movie trailer
-      ○ Movie poster
-      ○ Movie genre
-      ○ Alternative titles
- 
-      ○ Production companies
-      ○ Release date
-      ○ Original language
-      ○ Cast (Linked to detail page)
-      ○ Popularity
-      ○ Reviews
-      ○ List of similar movies
-               */
+        'post_content' => $movie_data['overview'],
+    ]);
+
     if (is_wp_error($movie_post_id)) return;
 
-    // Save the release date as a custom field
+    // Salva a data de lançamento como campo personalizado
     update_field('release_date', $movie_data['release_date'], $movie_post_id);
-    update_field('overview', $movie_data['overview'], $movie_post_id);
 
-    // Fetch the actors (cast)
+    // Busca os atores (cast)
     $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
     $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
 
@@ -61,18 +45,13 @@ function import_movie_with_cast($movie_id) {
     foreach (array_slice($cast_data['cast'], 0, 5) as $actor) {
         $actor_name = $actor['name'];
 
-        // Check if actor already exists using WP_Query
-        $actor_query = new WP_Query([
-            'post_type'      => 'actor',
-            'title'          => $actor_name,
-            'posts_per_page' => 1,
-            'fields'         => 'ids',
-        ]);
+        // Verifica se ator já existe
+        $existing = get_page_by_title($actor_name, OBJECT, 'actor');
 
-        if (!empty($actor_query->posts)) {
-            $actor_id = $actor_query->posts[0];
+        if ($existing) {
+            $actor_id = $existing->ID;
         } else {
-            // Create new actor post
+            // Cria novo post actor
             $actor_id = wp_insert_post([
                 'post_title'  => $actor_name,
                 'post_type'   => 'actor',
@@ -83,13 +62,13 @@ function import_movie_with_cast($movie_id) {
         $actor_ids[] = $actor_id;
     }
 
-    // Link actors to the movie
+    // Relaciona atores ao filme
     update_field('actors', $actor_ids, $movie_post_id);
 }
 
-// Function that fetches upcoming movies and calls the import function
+// Função que busca os próximos lançamentos e chama a função de importação
 function import_upcoming_movies_with_cast() {
-    $api_key = '9facf375ac53c66a77dfa59841360240';
+    $api_key = 'SUA_API_KEY_DO_TMDB';
 
     $response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
     $data = json_decode(wp_remote_retrieve_body($response), true);
@@ -108,7 +87,7 @@ function import_upcoming_movies_with_cast() {
 add_action('init', function() {
     if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
         import_upcoming_movies_with_cast();
-        echo 'Import completed.';
+        echo 'Importação finalizada.';
         exit;
     }
 });

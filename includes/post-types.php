@@ -1,4 +1,6 @@
 <?php 
+
+// Movies Post Type Registration
 function register_movie_cpt() {
     register_post_type('movie', [
         'labels' => [
@@ -14,3 +16,19 @@ function register_movie_cpt() {
     ]);
 }
 add_action('init', 'register_movie_cpt');
+
+// Register custom post type "Actor"
+function register_actor_post_type() {
+    register_post_type('actor', array(
+        'labels' => array(
+            'name' => 'Actors',
+            'singular_name' => 'Actor'
+        ),
+        'public' => true,
+        'has_archive' => false,
+        'supports' => array('title', 'editor', 'thumbnail'),
+        'show_in_rest' => true,
+    ));
+}
+add_action('init', 'register_actor_post_type');
+
