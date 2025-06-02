@@ -35,6 +35,12 @@ function import_upcoming_movies_with_cast()
 }
 
 add_action('init', function () {
+/*
+TO DO:
+ */
+
+
+
   if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
     import_upcoming_movies_with_cast();
     echo 'Import completed.';
