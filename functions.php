@@ -39,8 +39,17 @@ function import_movie_with_cast($movie_id)
   update_field('poster_url', $movie_data['poster_path'], $movie_post_id);
   update_field('production_companies', $movie_data['production_companies'], $movie_post_id); // array
   update_field('original_language', $movie_data['original_language'], $movie_post_id);
-  //update_field('genres', $movie_data['genres'], $movie_post_id); // array 
-
+ 
+  // Genres
+  $genres = [];
+  if (!empty($movie_data['genres'])) {
+    foreach ($movie_data['genres'] as $genre) {
+      $genres[] = $genre['name'];
+    }
+  }
+  $genres = implode(', ', $genres);
+  update_field('genres', $genres, $movie_post_id);
+ 
   // Fetch the actors (cast)
   $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
   $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
@@ -52,16 +61,14 @@ function import_movie_with_cast($movie_id)
       ];
     }
   }
-  // convert cast list to a string for ACF name,name,name.
+
   $cast_list = implode(', ', array_map(function ($actor) {
     return $actor['name'];
   }, $cast_list));
   // Save the cast as a custom field
   update_field('cast', $cast_list, $movie_post_id);
 
-  // Genres
 
-  
 
   
 
