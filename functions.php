@@ -113,31 +113,6 @@ function import_movie_with_cast($movie_id)
 }
 
 
-// Function that fetches upcoming movies and calls the import function
-function import_upcoming_movies_with_cast()
-{
-  $api_key = '9facf375ac53c66a77dfa59841360240';
-
-  $response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
-  $data = json_decode(wp_remote_retrieve_body($response), true);
 
 
 
-  if (empty($data['results'])) {
-    return;
-  }
-
-  $movies = array_slice($data['results'], 0, 10);
-
-  foreach ($movies as $movie) {
-    import_movie_with_cast($movie['id']);
-  }
-}
-
-add_action('init', function () {
-  if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
-    import_upcoming_movies_with_cast();
-    echo 'Import completed.';
-    exit;
-  }
-});
