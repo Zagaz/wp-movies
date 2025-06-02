@@ -37,24 +37,19 @@ if (have_posts()) :
             <?php echo esc_html($cast). '.'; ?>
               <p><strong>Actors:</strong></p>
             <?php 
-        
-            $actors_array = explode(',', trim($actors, '[]'));
-            // Loop through each actor ID and display their name
-            if (!empty($actors_array)) {
+      
+            if (is_array($actors) && !empty($actors)) {
               
-                foreach ($actors_array as $actor_id) {
-                    $actor_name = get_the_title($actor_id); // Get actor name by ID
-                    if ($actor_name) {
-                        echo '<a href="' . esc_url(get_permalink($actor_id)) . '">' . esc_html($actor_name) . '</a>, ';
-                    }
+                foreach ($actors as $actor_id) {
+                    $actor_name = get_the_title($actor_id);
+                    echo  '<a href="' . get_permalink($actor_id) . '">' . esc_html($actor_name) . '</a>, ';
+
                 }
-              
+                
             } else {
                 echo '<p>No actors found.</p>';
             }
        
-
-
 
       
             

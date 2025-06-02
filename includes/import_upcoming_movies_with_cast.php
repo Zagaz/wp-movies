@@ -38,13 +38,14 @@ add_action('init', function () {
 /*
 TO DO:
  */
+// check if post type 'movie' posts > 0 
+
 
 
 
   if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
     import_upcoming_movies_with_cast();
     echo 'Import completed.';
-    // log time
     $log_time = date('Y-m-d H:i:s');
     error_log("Import completed at {$log_time}\n", 3, plugin_dir_path(__FILE__) . 'import_log.txt');
     exit;
