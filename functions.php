@@ -78,11 +78,6 @@ function import_movie_with_cast($movie_id)
   update_field('cast', $cast_list, $movie_post_id);
 
 
-
-  
-
-  //update_field('actors_list', $cast_data['cast'], $movie_post_id);
-
   if (empty($cast_data['cast'])) return;
 
   $actor_ids = [];
