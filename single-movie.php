@@ -19,11 +19,11 @@ if (have_posts()) :
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
             
-
             <?php if ($poster_url): ?>
-                /<?php 
+                <?php 
+                $image_url = 'https://image.tmdb.org/t/p/w500' ;
            
-                $image_url = 'https://image.tmdb.org/t/p/w500' . $image_path; ?>
+                 ?>
 
                 <img src="<?php echo esc_url( $image_url.$poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
             <?php endif; ?>
