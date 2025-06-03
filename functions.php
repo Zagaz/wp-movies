@@ -67,51 +67,57 @@ function import_movie_with_cast($movie_id)
 
 // Actors
 
+$actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_data['id']}/credits?api_key={$api_key}&language=en-US");
+$actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
 
-  $actors_response = wp_remote_get( "https://api.themoviedb.org/3/movie/{$movie_data['id']}/credits?api_key={$api_key}&language=en-US");
-  $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
-  echo '<pre>';
-  echo 'Actors Data:';
-
-  echo `Movie Title: {$movie_data['title']}`;
-  var_dump($actors_data['cast']);
-  echo '</pre>';
-  //die();
-  $actor_ids = [];
-  // $actors_data["cast"][0]['id'] ;
-  // make a list only with the actor ids
-  if (!empty($actors_data['cast'])) {
+$actor_ids = [];
+if (!empty($actors_data['cast'])) {
     foreach ($actors_data['cast'] as $actor) {
-      $actor_ids[] = $actor['id']; // Collect unique actor IDs
-      // Create or update the actor post
-      $actor_post_id = wp_insert_post([
-        'post_title'   => $actor['name'],
-        'post_type'    => 'actor',
-        'post_status'  => 'publish',
-      ]);
-      // get post id
-      update_field('tmdb_actor_id', $actor['id'], $actor_post_id); // Text
-      
-      // based on the tmdb_actor_id - fetch the api to get the actor details
-      $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$actor['id']}?api_key={$api_key}&language=en-US");
-      $actor_details_data = json_decode(wp_remote_retrieve_body($actor_details_response), true);
-      // Save additional actor details
-      update_field('biography', $actor_details_data['biography'], $actor_post_id); // Text Area
-      update_field('birthday', $actor_details_data['birthday'], $actor_post_id); // Date Picker
-      update_field('deathday', $actor_details_data['birthday'], $actor_post_id); // Date Picker      
-      update_field('place_of_birth', $actor_details_data['place_of_birth'], $actor_post_id); // Text
-      update_field('known_for_department', $actor_details_data['known_for_department'], $actor_post_id); // Text
-      update_field('profile_path', $actor['profile_path'], $actor_post_id); // Text
-      update_field('popularity', $actor['popularity'], $actor_post_id); // Text
-      update_field('homepage', $actor['homepage'], $actor_post_id); // Text
+        // Check if actor already exists by tmdb_actor_id
+        $existing_actor = new WP_Query([
+            'post_type'      => 'actor',
+            'meta_query'     => [
+                [
+                    'key'   => 'tmdb_actor_id',
+                    'value' => $actor['id'],
+                ]
+            ],
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
+        ]);
 
+        if (!empty($existing_actor->posts)) {
+            $actor_post_id = $existing_actor->posts[0];
+        } else {
+            // Create or update the actor post
+            $actor_post_id = wp_insert_post([
+                'post_title'   => $actor['name'],
+                'post_type'    => 'actor',
+                'post_status'  => 'publish',
+            ]);
+            update_field('tmdb_actor_id', $actor['id'], $actor_post_id); // Text
 
-      if (is_wp_error($actor_post_id)) continue;
+            // Fetch the actor details from the API
+            $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$actor['id']}?api_key={$api_key}&language=en-US");
+            $actor_details_data = json_decode(wp_remote_retrieve_body($actor_details_response), true);
 
-      // Save the actor's id list on the movie post
-      $actor_ids[] = $actor_post_id;
+            // Save additional actor details, using null coalescing to avoid warnings
+            update_field('biography', $actor_details_data['biography'] ?? '', $actor_post_id); // Text Area
+            update_field('birthday', $actor_details_data['birthday'] ?? '', $actor_post_id); // Date Picker
+            update_field('deathday', $actor_details_data['deathday'] ?? '', $actor_post_id); // Date Picker
+            update_field('place_of_birth', $actor_details_data['place_of_birth'] ?? '', $actor_post_id); // Text
+            update_field('known_for_department', $actor_details_data['known_for_department'] ?? '', $actor_post_id); // Text
+            update_field('profile_path', $actor['profile_path'] ?? '', $actor_post_id); // Text
+            update_field('popularity', $actor['popularity'] ?? '', $actor_post_id); // Text
+            update_field('homepage', $actor_details_data['homepage'] ?? '', $actor_post_id); // Text
+        }
+
+        if (is_wp_error($actor_post_id)) continue;
+
+        // Save the actor's id list on the movie post
+        $actor_ids[] = $actor_post_id;
     }
-  }
+}
   // CREW
   $crew_ids = [];
   if (!empty($actors_data['crew'])) {
@@ -134,16 +140,6 @@ function import_movie_with_cast($movie_id)
    update_field('crew', $crew_ids, $movie_post_id); // Text
    update_field('cast', $actor_ids, $movie_post_id); // Text
 
-
-  // After saving the movie, now save the actors' details on
-
-
-
-
-
-
-
-  // Link actors to the movie
 }
 
 
