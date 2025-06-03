@@ -26,6 +26,7 @@ function register_actor_post_type() {
         ),
         'public' => true,
         'has_archive' => false,
+          'menu_icon' => 'dashicons-admin-users',
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_rest' => true,
     ));
