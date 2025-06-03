@@ -107,13 +107,27 @@ function import_movie_with_cast($movie_id)
       $actor_ids[] = $actor_post_id;
     }
   }
+  // do the same for $actors_data['cast']
+  $crew_ids = [];
+  if (!empty($actors_data['crew'])) {
+    foreach ($actors_data['crew'] as $crew_member) {
+      $crew_ids[] = $crew_member['id']; // Collect unique crew IDs
+      // Create or update the crew post
+      $crew_post_id = wp_insert_post([
+        'post_title'   => $crew_member['name'],
+        'post_type'    => 'actor',
+        'post_status'  => 'publish',
+      ]);
 
-  echo '<pre>';
-  echo "Actor IDs for movie ID {$movie_id}:";
-  var_dump($actor_ids);
-  echo '</pre>';
-  // Save the Actors ids on the movie post
-  update_field('actors', $actor_ids, $movie_post_id);
+      if (is_wp_error($crew_post_id)) continue;
+
+      // Save the crew's id list on the movie post
+      $crew_ids[] = $crew_post_id;
+    }
+  }
+  // Save the actor and crew IDs as a custom field on the movie post
+   update_field('crew', $crew_ids, $movie_post_id); // Text
+   update_field('actors', $actor_ids, $movie_post_id); // Text
 
 
 
