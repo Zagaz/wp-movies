@@ -19,6 +19,7 @@ function import_movie_with_cast($movie_id)
   $movie_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US");
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
 
+ 
   if (empty($movie_data['title'])) {
     return;
   }
@@ -62,9 +63,8 @@ function import_movie_with_cast($movie_id)
   $production_companies = implode(', ', $production_companies);
   update_field('production_companies', $production_companies, $movie_post_id);
  
+  //The cast
   $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
-
-
   $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
   $cast_list = [];
   if (!empty($cast_data['cast'])) {
@@ -81,60 +81,22 @@ function import_movie_with_cast($movie_id)
   // Save the cast as a custom field
   update_field('cast', $cast_list, $movie_post_id);
 
+
 // Actors
-  $actor_ids = [];
-
-  foreach (array_slice($cast_data['cast'], 0, 5) as $actor) {
-    $actor_name = $actor['name'];
-
-    // Check if actor already exists using WP_Query
-    $actor_query = new WP_Query([
-      'post_type'      => 'actor',
-      'title'          => $actor_name,
-      'posts_per_page' => 1,
-      'fields'         => 'ids',
-    ]);
- 
-
-    if (!empty($actor_query->posts)) {
-      $actor_id = $actor_query->posts[0];
-    } else {
-      // Create new actor post
-      $actor_id = wp_insert_post([
-        'post_title'  => $actor_name,
-        'post_type'   => 'actor',
-        'post_status' => 'publish',
-        'post_content' => $actor['biography'] ?? '', // Optional biography
-      ]);
-    }
-    $actor_ids[] = $actor_id;
-    // Here are the ACF fields for the actor
-    /*
-    ○ Photo - profile_path //
-    
-    ○ Birthday - birthday //
-    ○ Place of birth - place_of_birth // 
-    ○ Day of death (if applies) - deathday //
-    ○ Website (if applies) - homepage
-    ○ Popularity - popularity
-    ○ Bio - biography <======
-    ○   profile_path //
-    ○ Gallery of images (max 10 items)
-    ○ List of movies related to the actor, sorted by date displaying: movie poster,
-    character name, movie title and release date
-     */
-    update_field('tmdb_actor_id', $actor['id'], $actor_id); // Text
-    update_field('profile_path', $actor['profile_path'], $actor_id); // Image URL
-    update_field('birthday', $actor['birthday'], $actor_id); // Date Picker
-    update_field('deathday', $actor['deathday'], $actor_id); // Text
-    update_field('place_of_birth', $actor['place_of_birth'], $actor_id); // Text 
-    update_field('homepage', $actor['homepage'], $actor_id); // Text
-    update_field('popularity', $actor['popularity'], $actor_id); // Number
 
 
 
 
-  }
+
+
+
+
+
+
+
+
+
+
   // api - fetch actor data by id
   $actor_ids = array_unique($actor_ids); // Ensure unique actor IDs
   // Update the actor posts with additional ACF fields
@@ -146,8 +108,16 @@ function import_movie_with_cast($movie_id)
     }
     echo '<pre>';
 
-    //var_dump($actor_data);
+   var_dump($actor_data);
     echo '</pre>';
+
+    update_field('profile_path', $actor_data['profile_path'] ?? '', $actor_id); // Image URL
+    update_field('birthday', $actor_data['birthday'] ?? '', $actor_id); // Date Picker
+    update_field('deathday', $actor_data['deathday'] ?? '', $actor_id); // Text
+    update_field('place_of_birth', $actor_data['place_of_birth'] ?? '', $actor_id); // Text 
+    update_field('homepage', $actor_data['homepage'] ?? '', $actor_id); // Text
+    update_field('popularity', $actor_data['popularity'] ?? '', $actor_id); // Number
+
 
 
 
