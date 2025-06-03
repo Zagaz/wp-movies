@@ -20,17 +20,18 @@ function import_movie_with_cast($movie_id)
 
   $url = "https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US";
 
-  $url2 ="https://api.themoviedb.org/3/discover/movie?&language=en-US&release_date.gte=2025-07-01&api_key={$api_key}"; 
+  $url2 ="https://api.themoviedb.org/3/discover/movie?&language=en-US&&primary_release_date.gte=2025-06-03&api_key={$api_key}&language=en-US"; 
 
   $movie_response = wp_remote_get($url2);
 
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
   $movies = $movie_data['results'] ?? [];
 
+
   echo '<pre>';
-  print_r($movies);
+   print_r($movies);
   echo '</pre>';
-  die();
+  // die();
 
   foreach ($movies as $movie) {
       // Defensive: skip if no title or overview
