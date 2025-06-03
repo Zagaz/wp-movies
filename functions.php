@@ -105,16 +105,11 @@ function import_movie_with_cast($movie_id)
   //var_dump($actors_response['body']); 
   // convert $actors_response['body'] to json
   $actors_response['body'] = json_decode($actors_response['body'], true);
-  var_dump($actors_response['body']);  //============>>> Credits
-  echo '</pre>';
-  die();
 
-  $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
 
-  echo '<pre>';
-  var_dump($actors_response);
-  echo '</pre>';
-  die();
+  $actors_data =   $actors_response['body'];
+
+
 
   $cast_names = [];
   if (!empty($actors_data['cast'])) {

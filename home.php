@@ -70,8 +70,12 @@
         $args = array(
             'post_type' => 'actor',
             'posts_per_page' => 10,
-            'orderby' => 'rand', // Random order for variety
-        );
+            // order by popularity, descending
+            'meta_key' => 'popularity',
+            'orderby' => 'meta_value_num',
+            'order' => 'DESC',
+            
+                    );
         $image_url = 'https://image.tmdb.org/t/p/w500';
         $actors = new WP_Query($args);
         if ($actors->have_posts()) :
@@ -82,7 +86,7 @@
                     <a href="<?php the_permalink(); ?>" class="block">
                         <div style="aspect-ratio:1/1;" class="w-full">
                             <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
-                            <?php echo $image_url . $actor_image ?>
+                            <?php echo esc_html(get_field('biography')); ?>
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
