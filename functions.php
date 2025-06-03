@@ -79,7 +79,7 @@ function import_movie_with_cast($movie_id)
   //die();
   $actor_ids = [];
   // $actors_data["cast"][0]['id'] ;
-  // make a list onçy with the actor ids
+  // make a list only with the actor ids
   if (!empty($actors_data['cast'])) {
     foreach ($actors_data['cast'] as $actor) {
       $actor_ids[] = $actor['id']; // Collect unique actor IDs
@@ -104,14 +104,6 @@ function import_movie_with_cast($movie_id)
       update_field('profile_path', $actor['profile_path'], $actor_post_id); // Text
       update_field('popularity', $actor['popularity'], $actor_post_id); // Text
       update_field('homepage', $actor['homepage'], $actor_post_id); // Text
-
-      
-      
-
-
-      
-
-
 
 
       if (is_wp_error($actor_post_id)) continue;
