@@ -127,7 +127,7 @@ function import_movie_with_cast($movie_id)
   }
   // Save the actor and crew IDs as a custom field on the movie post
    update_field('crew', $crew_ids, $movie_post_id); // Text
-   update_field('actors', $actor_ids, $movie_post_id); // Text
+   update_field('cast', $actor_ids, $movie_post_id); // Text
 
 
 
