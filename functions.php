@@ -15,12 +15,21 @@ function import_movie_with_cast($movie_id)
   //todo
   $api_key = '9facf375ac53c66a77dfa59841360240';
 
-  // Fetch up-coming movie data from TMDB API
-  // (`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`);
 
-  $movie_response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
+  https://api.themoviedb.org/3/discover/movie?api_key=YOUR_API_KEY&language=en-US&sort_by=release_date.asc&release_date.gte=2025-06-03&release_date.lte=2025-12-31
+
+  $movie_response = wp_remote_get("
+   https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.gte=2025-06-01&api_key={$api_key} 
+  
+  
+  ");
+
 
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
+  echo "<pre>";
+  var_dump($movie_data);
+  echo "</pre>";
+  die();
 
  
   if (empty($movie_data['title'])) {
