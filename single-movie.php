@@ -29,14 +29,32 @@ if (have_posts()) :
             <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
             <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
             <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
-            <p><strong>Cast:</strong></p>
-            <?php
-            var_dump($cast); // Debugging line to check the cast data
-            ?>
+
             <p><strong>Actors:</strong></p>
             <?php
             var_dump($actors); // Debugging line to check the actors data
+            // use the api to fetch actorsby id  $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$new_actor['id']}?api_key={$api_key}&language=en-US");
 
+           //todo
+  $api_key = '9facf375ac53c66a77dfa59841360240';
+
+
+     
+
+            ?>
+
+            
+            
+
+            
+
+    
+                
+           
+            
+            <p><strong>Cast:</strong></p>
+            <?php
+            var_dump($cast); // Debugging line to check the cast data
             ?>
         </div>
 

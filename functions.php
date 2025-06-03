@@ -73,7 +73,7 @@ if (is_wp_error($actors_response)) {
 }
 $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
 
-$actor_ids = [];
+$cast_names = [];
 if (!empty($actors_data['cast'])) {
     // Collect all actor IDs that don't exist yet to fetch their details in batch
     $new_actors = [];
@@ -113,8 +113,10 @@ if (!empty($actors_data['cast'])) {
 
         if (is_wp_error($actor_post_id)) continue;
 
-        // Save the actor's id list on the movie post
-        $actor_ids[] = $actor_post_id;
+        // Save the actor's (cast) name and id list on the movie post in the same array 
+        $cast_names[] = $actor['name'];
+        $cast_ids[] = $actor_post_id;
+ 
     }
 
     // Fetch details for all new actors (sequentially, as TMDB API does not support batch)
@@ -137,10 +139,10 @@ if (!empty($actors_data['cast'])) {
     }
 }
   // CREW
-  $crew_ids = [];
+  $crew_names = [];
   if (!empty($actors_data['crew'])) {
     foreach ($actors_data['crew'] as $crew_member) {
-      $crew_ids[] = $crew_member['id']; // Collect unique crew IDs
+      $crew_names[] = $crew_member['name'] ?? ''; // Collect unique crew names
       // Create or update the crew post
       $crew_post_id = wp_insert_post([
         'post_title'   => $crew_member['name'],
@@ -151,12 +153,16 @@ if (!empty($actors_data['cast'])) {
       if (is_wp_error($crew_post_id)) continue;
 
       // Save the crew's id list on the movie post
+      $crew_names[] = $crew_member['name'];
       $crew_ids[] = $crew_post_id;
+
     }
   }
   // Save the actor and crew IDs as a custom field on the movie post
    update_field('crew', $crew_ids, $movie_post_id); // Text
-   update_field('cast', $actor_ids, $movie_post_id); // Text
+   update_field ('crew_id', $crew_names, $movie_post_id); // Text
+   update_field('cast', $cast_names, $movie_post_id); // Text
+   update_field('cast_id', $cast_ids, $movie_post_id); // Text
 
 }
 
