@@ -55,6 +55,7 @@ function import_movie_with_cast($movie_id)
 
       // Create the movie post
       $movie_post_id = wp_insert_post([
+
           'post_title'   => $movie['title'],
           'post_content' => $movie['overview'],
           'post_type'    => 'movie',
@@ -62,6 +63,8 @@ function import_movie_with_cast($movie_id)
       ]);
 
       if (is_wp_error($movie_post_id)) continue;
+
+      
 
       // Now use $movie['id'], $movie['release_date'], etc.
       update_field('tmdb_id', $movie['id'] ?? '', $movie_post_id);
@@ -93,12 +96,25 @@ function import_movie_with_cast($movie_id)
 
 
   // Actors
+ 
+ 
 
   $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
-  if (is_wp_error($actors_response)) {
-      return; // Stop if API call fails
-  }
+
+  echo '<pre>';
+  //var_dump($actors_response['body']); 
+  // convert $actors_response['body'] to json
+  $actors_response['body'] = json_decode($actors_response['body'], true);
+  var_dump($actors_response['body']);  //============>>> Credits
+  echo '</pre>';
+  die();
+
   $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
+
+  echo '<pre>';
+  var_dump($actors_response);
+  echo '</pre>';
+  die();
 
   $cast_names = [];
   if (!empty($actors_data['cast'])) {
