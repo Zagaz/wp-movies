@@ -96,6 +96,11 @@ function import_movie_with_cast($movie_id)
       'posts_per_page' => 1,
       'fields'         => 'ids',
     ]);
+    echo '<pre>';
+    print_r($actor_query);
+    echo '</pre>';
+
+    
 
     if (!empty($actor_query->posts)) {
       $actor_id = $actor_query->posts[0];
@@ -107,8 +112,22 @@ function import_movie_with_cast($movie_id)
         'post_status' => 'publish'
       ]);
     }
-
     $actor_ids[] = $actor_id;
+    // Here are the ACF fields for the actor
+    /*
+    ○ Photo
+    ○ Name
+    ○ Birthday
+    ○ Place of birth
+    ○ Day of death (if applies)
+    ○ Website (if applies)
+    ○ Popularity
+    ○ Bio
+    ○ Gallery of images (max 10 items)
+    ○ List of movies related to the actor, sorted by date displaying: movie poster,
+    character name, movie title and release date
+     */
+    update_field('tmdb_actor_id', $actor['id'], $actor_id); // Text
   }
 
   // Link actors to the movie

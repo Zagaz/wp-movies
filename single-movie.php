@@ -13,19 +13,14 @@ if (have_posts()) :
         $original_language = get_field('original_language');
         $cast = get_field('cast');
         $actors = get_field('actors');
-        
-        ?>
-        
+?>
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
-            
             <?php if ($poster_url): ?>
-                <?php 
-                $image_url = 'https://image.tmdb.org/t/p/w500' ;
-           
-                 ?>
-
-                <img src="<?php echo esc_url( $image_url.$poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
+                <?php
+                $image_url = 'https://image.tmdb.org/t/p/w500';
+                ?>
+                <img src="<?php echo esc_url($image_url . $poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
             <?php endif; ?>
 
             <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
@@ -34,42 +29,24 @@ if (have_posts()) :
             <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
             <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
             <p><strong>Cast:</strong></p>
-            <?php echo esc_html($cast). '.'; ?>
-              <p><strong>Actors:</strong></p>
-            <?php 
-      
+            <?php echo esc_html($cast) . '.'; ?>
+            <p><strong>Actors:</strong></p>
+            <?php
+
             if (is_array($actors) && !empty($actors)) {
-              
+
                 foreach ($actors as $actor_id) {
                     $actor_name = get_the_title($actor_id);
                     echo  '<a href="' . get_permalink($actor_id) . '">' . esc_html($actor_name) . '</a>, ';
-
                 }
-                
             } else {
                 echo '<p>No actors found.</p>';
             }
-       
-
-      
-            
-            
-            
             ?>
-
-
-           
-        
-        
-
-            
-
-
-
         </div>
 
-        <?php
+<?php
     endwhile;
 endif;
 
-get_footer(); 
+get_footer();
