@@ -2,7 +2,7 @@
 
 <h1 class="text-5xl text-cyan-900 font-bold text-center my-10">Hello home</h1>
 <div class="max-w-6xl mx-auto px-4 py-10 bg-white rounded shadow-md">
-    <h2 class="text-3xl font-bold text-gray-800 mb-4">Latest Movies</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Coming up</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         <?php
         $args = array(
@@ -64,5 +64,36 @@
             <p class="text-gray-600">No movies found.</p>
         <?php endif; ?>
     </div>
+     <h2 class="text-3xl font-bold text-gray-800 mb-4">Top 10 popular actors</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <?php
+        $args = array(
+            'post_type' => 'actor',
+            'posts_per_page' => 10,
+            'orderby' => 'rand', // Random order for variety
+        );
+        $image_url = 'https://image.tmdb.org/t/p/w500';
+        $actors = new WP_Query($args);
+        if ($actors->have_posts()) :
+            while ($actors->have_posts()) : $actors->the_post();
+                $actor_image = get_field('profile_path');
+                ?>
+                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
+                    <a href="<?php the_permalink(); ?>" class="block">
+                        <div style="aspect-ratio:1/1;" class="w-full">
+                            <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
+                            <?php echo $image_url . $actor_image ?>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
+                        </div>
+                    </a>
+                </div>
+            <?php endwhile;
+            wp_reset_postdata();
+        else : ?>
+            <p class="text-gray-600">No actors found.</p>
+        <?php endif; ?>
+
 
 <?php get_footer(); ?>
