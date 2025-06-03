@@ -87,7 +87,6 @@ function import_upcoming_movies_with_cast() {
 add_action('init', function() {
     if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
         import_upcoming_movies_with_cast();
-        echo 'Importação finalizada.';
         exit;
     }
 });

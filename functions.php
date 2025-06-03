@@ -32,6 +32,7 @@ function import_movie_with_cast($movie_id)
     'post_status'  => 'publish',
   ]);
 
+
   
 
 
@@ -113,26 +114,6 @@ function import_movie_with_cast($movie_id)
   // Link actors to the movie
   update_field('actors', $actor_ids, $movie_post_id);
 }
-
-// Register a custom interval of 5 minutes
-add_filter('cron_schedules', function($schedules) {
-    $schedules['every_five_minutes'] = [
- 
-        'interval' => 300, // 5 minutes in seconds
-        'display'  => __('Every 5 Minutes'),
-    ];
-    return $schedules;
-});
-
-// Schedule the event if not already scheduled
-if (!wp_next_scheduled('wp_movies_import_upcoming_movies_event')) {
-    wp_schedule_event(time(), 'every_five_minutes', 'wp_movies_import_upcoming_movies_event');
-}
-
-// Hook the event to your function
-add_action('wp_movies_import_upcoming_movies_event', 'import_upcoming_movies_with_cast');
-
-
 
 
 
