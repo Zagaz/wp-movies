@@ -8,6 +8,11 @@
         $args = array(
             'post_type' => 'movie',
             'posts_per_page' => 10,
+            // order by release date, descending
+            'meta_key' => 'release_date',
+            'orderby' => 'meta_value',
+            'order' => 'DESC',
+            
         );
         $movies = new WP_Query($args);
         if ($movies->have_posts()) :
