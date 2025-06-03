@@ -84,47 +84,51 @@ function import_movie_with_cast($movie_id)
 
 // Actors
 
+// using the $movie_data['id'] fetch api actors
 
+  $actors_response = wp_remote_get( "https://api.themoviedb.org/3/movie/{$movie_data['id']}/credits?api_key={$api_key}&language=en-US");
+  $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
+  $actor_ids = [];
+  // $actors_data["cast"][0]['id'] ;
+  // make a list onçy with the actor ids
+  if (!empty($actors_data['cast'])) {
+    foreach ($actors_data['cast'] as $actor) {
+      $actor_ids[] = $actor['id']; // Collect unique actor IDs
+      // Create or update the actor post
+      $actor_post_id = wp_insert_post([
+        'post_title'   => $actor['name'],
+        'post_type'    => 'actor',
+        'post_status'  => 'publish',
+      ]);
 
+      if (is_wp_error($actor_post_id)) continue;
 
-
-
-
-
-
-
-
-
-
-
-  // api - fetch actor data by id
-  $actor_ids = array_unique($actor_ids); // Ensure unique actor IDs
-  // Update the actor posts with additional ACF fields
-  foreach ($actor_ids as $actor_id) {
-    $actor_data_response = wp_remote_get("https://api.themoviedb.org/3/person/{$actor_id}?api_key={$api_key}&language=en-US");
-    $actor_data = json_decode(wp_remote_retrieve_body($actor_data_response), true);
-    if (is_wp_error($actor_data_response) || empty($actor_data)) {
-      continue; // Skip if there's an error or no data
+      // Save the actor's id list on the movie post
+      $actor_ids[] = $actor_post_id;
     }
-    echo '<pre>';
+  }
 
-   var_dump($actor_data);
-    echo '</pre>';
+  echo '<pre>';
+  echo "Actor IDs for movie ID {$movie_id}:";
+  var_dump($actor_ids);
+  echo '</pre>';
+  // Save the Actors ids on the movie post
+  update_field('actors', $actor_ids, $movie_post_id);
 
-    update_field('profile_path', $actor_data['profile_path'] ?? '', $actor_id); // Image URL
-    update_field('birthday', $actor_data['birthday'] ?? '', $actor_id); // Date Picker
-    update_field('deathday', $actor_data['deathday'] ?? '', $actor_id); // Text
-    update_field('place_of_birth', $actor_data['place_of_birth'] ?? '', $actor_id); // Text 
-    update_field('homepage', $actor_data['homepage'] ?? '', $actor_id); // Text
-    update_field('popularity', $actor_data['popularity'] ?? '', $actor_id); // Number
+
+
+    // update_field('profile_path', $actor_data['profile_path'] ?? '', $actor_id); // Image URL
+    // update_field('birthday', $actor_data['birthday'] ?? '', $actor_id); // Date Picker
+    // update_field('deathday', $actor_data['deathday'] ?? '', $actor_id); // Text
+    // update_field('place_of_birth', $actor_data['place_of_birth'] ?? '', $actor_id); // Text 
+    // update_field('homepage', $actor_data['homepage'] ?? '', $actor_id); // Text
+    // update_field('popularity', $actor_data['popularity'] ?? '', $actor_id); // Number
 
 
 
 
   // Link actors to the movie
-  update_field('actors', $actor_ids, $movie_post_id);
 }
 
 
 
-}
