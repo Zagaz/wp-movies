@@ -15,8 +15,11 @@ function import_movie_with_cast($movie_id)
   //todo
   $api_key = '9facf375ac53c66a77dfa59841360240';
 
-  // Fetch movie details
-  $movie_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US");
+  // Fetch up-coming movie data from TMDB API
+  // (`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`);
+
+  $movie_response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
+
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
 
  
