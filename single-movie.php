@@ -51,9 +51,16 @@ if (have_posts()) :
            
             
             <p><strong>Cast:</strong></p>
-            <?php
-            var_dump($cast); // Debugging line to check the cast data
+                   <?php
+            foreach ($crew as $crewmember) {
+                echo $crewmember. ', ';
+              
+            }
+
+
             ?>
+
+           
         </div>
 
 <?php
