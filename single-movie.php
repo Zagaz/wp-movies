@@ -11,8 +11,8 @@ if (have_posts()) :
         $overview     = get_field('overview');
         $production_companies = get_field('production_companies');
         $original_language = get_field('original_language');
-        $cast = get_field('crew');
-        $actors = get_field('cast');
+        $cast = get_field('cast');
+        $crew = get_field('crew');
 ?>
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
@@ -32,14 +32,12 @@ if (have_posts()) :
 
             <p><strong>Actors:</strong></p>
             <?php
-            var_dump($actors); // Debugging line to check the actors data
-            // use the api to fetch actorsby id  $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$new_actor['id']}?api_key={$api_key}&language=en-US");
+            foreach ($cast as $actor) {
+                
+                echo  esc_html($actor) . ', ';
+            }       
 
            //todo
-  $api_key = '9facf375ac53c66a77dfa59841360240';
-
-
-     
 
             ?>
 
