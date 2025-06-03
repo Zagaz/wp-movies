@@ -101,10 +101,7 @@ if (!empty($actors_data['cast'])) {
             $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$actor['id']}?api_key={$api_key}&language=en-US");
             $actor_details_data = json_decode(wp_remote_retrieve_body($actor_details_response), true);
 
-            echo '<pre>';
-          //  print_r($actor_details_data);
-            echo '</pre>';
-        //    die();
+          
 
             // Save additional actor details, using null coalescing to avoid warnings
             update_field('biography', $actor_details_data['biography'] ?? '', $actor_post_id); // Text Area
@@ -115,9 +112,7 @@ if (!empty($actors_data['cast'])) {
             update_field('profile_path', $actor['profile_path'] ?? '', $actor_post_id); // Text
             update_field('popularity', $actor['popularity'] ?? '', $actor_post_id); // Text
             update_field('homepage', $actor_details_data['homepage'] ?? '', $actor_post_id); // Text
-            
-      
-      
+
         }
 
         if (is_wp_error($actor_post_id)) continue;
