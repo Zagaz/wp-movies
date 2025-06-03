@@ -33,11 +33,11 @@ if (have_posts()) :
             <p><strong>Actors:</strong></p>
             <?php
             foreach ($cast as $actor) {
-                
-                echo  esc_html($actor) . ', ';
-            }       
+                $url = get_site_url() . '/actor/' . sanitize_title($actor);
+                echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
+              
+            }
 
-           //todo
 
             ?>
 
