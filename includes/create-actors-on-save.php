@@ -32,6 +32,6 @@ function create_actors_from_actors_list($post_id) {
     }
 
     // Reanexa o hook
-    add_action('save_post', 'create_actors_from_actors_list');
+  //  add_action('save_post', 'create_actors_from_actors_list');
 }
-add_action('save_post', 'create_actors_from_actors_list');
+//add_action('save_post', 'create_actors_from_actors_list');

@@ -63,31 +63,20 @@ function import_movie_with_cast($movie_id)
   $production_companies = implode(', ', $production_companies);
   update_field('production_companies', $production_companies, $movie_post_id);
  
-  //The cast
-  $cast_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie_id}/credits?api_key={$api_key}&language=en-US");
-  $cast_data = json_decode(wp_remote_retrieve_body($cast_response), true);
-  $cast_list = [];
-  if (!empty($cast_data['cast'])) {
-    foreach ($cast_data['cast'] as $actor) {
-      $cast_list[] = [
-        'name' => $actor['name'],
-      ];
-    }
-  }
-
-  $cast_list = implode(', ', array_map(function ($actor) {
-    return $actor['name'];
-  }, $cast_list));
-  // Save the cast as a custom field
-  update_field('cast', $cast_list, $movie_post_id);
 
 
 // Actors
 
-// using the $movie_data['id'] fetch api actors
 
   $actors_response = wp_remote_get( "https://api.themoviedb.org/3/movie/{$movie_data['id']}/credits?api_key={$api_key}&language=en-US");
   $actors_data = json_decode(wp_remote_retrieve_body($actors_response), true);
+  echo '<pre>';
+  echo 'Actors Data:';
+
+  echo `Movie Title: {$movie_data['title']}`;
+  var_dump($actors_data['cast']);
+  echo '</pre>';
+  //die();
   $actor_ids = [];
   // $actors_data["cast"][0]['id'] ;
   // make a list onçy with the actor ids
@@ -100,6 +89,10 @@ function import_movie_with_cast($movie_id)
         'post_type'    => 'actor',
         'post_status'  => 'publish',
       ]);
+      // get post id
+      update_field('tmdb_actor_id', $actor['id'], $actor_post_id); // Text
+
+
 
       if (is_wp_error($actor_post_id)) continue;
 
@@ -107,7 +100,7 @@ function import_movie_with_cast($movie_id)
       $actor_ids[] = $actor_post_id;
     }
   }
-  // do the same for $actors_data['cast']
+  // CREW
   $crew_ids = [];
   if (!empty($actors_data['crew'])) {
     foreach ($actors_data['crew'] as $crew_member) {
@@ -130,13 +123,10 @@ function import_movie_with_cast($movie_id)
    update_field('cast', $actor_ids, $movie_post_id); // Text
 
 
+  // After saving the movie, now save the actors' details on
 
-    // update_field('profile_path', $actor_data['profile_path'] ?? '', $actor_id); // Image URL
-    // update_field('birthday', $actor_data['birthday'] ?? '', $actor_id); // Date Picker
-    // update_field('deathday', $actor_data['deathday'] ?? '', $actor_id); // Text
-    // update_field('place_of_birth', $actor_data['place_of_birth'] ?? '', $actor_id); // Text 
-    // update_field('homepage', $actor_data['homepage'] ?? '', $actor_id); // Text
-    // update_field('popularity', $actor_data['popularity'] ?? '', $actor_id); // Number
+
+
 
 
 
