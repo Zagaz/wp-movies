@@ -25,18 +25,37 @@ function import_movie_with_cast($movie_id)
   $movie_response = wp_remote_get($url2);
 
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
-  $movies = $movie_data['results'] ?? [];
+  $movies_res = $movie_data['results'] ?? [];
+
+    // just keep the first 10 movies
+  $movies = array_slice($movies_res, 0, 10);
+  echo "<pre>";
+  //var_dump($movies); // Debugging line to see the fetched movies
+  //die();
 
 
-  echo '<pre>';
-   print_r($movies);
-  echo '</pre>';
-   die();
+
 
   foreach ($movies as $movie) {
       // Defensive: skip if no title or overview
       if (empty($movie['title']) || empty($movie['overview'])) {
           continue;
+      }
+
+      // Check if this movie already exists by tmdb_id
+      $existing = new WP_Query([
+          'post_type'  => 'movie',
+          'meta_query' => [
+              [
+                  'key'   => 'tmdb_id',
+                  'value' => $movie['id'],
+              ]
+          ],
+          'posts_per_page' => 1,
+          'fields' => 'ids',
+      ]);
+      if (!empty($existing->posts)) {
+          continue; // Skip if already exists
       }
 
       // Create the movie post
