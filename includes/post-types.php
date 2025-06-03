@@ -9,7 +9,7 @@ function register_movie_cpt() {
         ],
         'public' => true,
         'has_archive' => true,
-        'menu_icon' => 'dashicons-video-alt2',
+        'menu_icon' => 'dashicons-editor-video',
         'supports' => ['title', 'editor', 'thumbnail'],
         'rewrite' => ['slug' => 'movies'],
         'show_in_rest' => true, // important for ACF compatibility
@@ -26,7 +26,7 @@ function register_actor_post_type() {
         ),
         'public' => true,
         'has_archive' => false,
-          'menu_icon' => 'dashicons-admin-users',
+          'menu_icon' => 'dashicons-universal-access-alt',
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_rest' => true,
     ));
