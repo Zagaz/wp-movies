@@ -65,42 +65,32 @@ function import_movie_with_cast($movie_id)
     update_field('production_companies', $movie['production_companies'] ?? '', $movie_post_id);
     update_field('original_language', $movie['original_language'] ?? '', $movie_post_id);
 
-// test
-echo '<pre>';
-$genres_ids = $movie['genre_ids'] ?? [];
 
-var_dump($genres_ids);
+    $genres_ids = $movie['genre_ids'] ?? [];
 
-// using this id's fetch the name of the genre and compare to $genres_ids
-$genre_url = "https://api.themoviedb.org/3/genre/movie/list?language=en-US&api_key={$api_key}";
-$genre_response = wp_remote_get($genre_url);
-$genre_data = json_decode(wp_remote_retrieve_body($genre_response), true);
-$genres = [];
-if (!empty($genre_data['genres'])) {
-  foreach ($genre_data['genres'] as $genre) {
-    if (in_array($genre['id'], $genres_ids)) {
-      $genres[] = $genre['name'];
+
+
+    // using this id's fetch the name of the genre and compare to $genres_ids
+    $genre_url = "https://api.themoviedb.org/3/genre/movie/list?language=en-US&api_key={$api_key}";
+    $genre_response = wp_remote_get($genre_url);
+    $genre_data = json_decode(wp_remote_retrieve_body($genre_response), true);
+    $genres = [];
+    if (!empty($genre_data['genres'])) {
+      foreach ($genre_data['genres'] as $genre) {
+        if (in_array($genre['id'], $genres_ids)) {
+          $genres[] = $genre['name'];
+        }
+      }
     }
-  }
-} 
-// Convert genres array to a comma-separated string
-$genres = implode(', ', $genres);
-// Save the genres as a custom field on the movie post
-if (!empty($genres)) {
-  update_field('genres', $genres, $movie_post_id); // Text
-} else {
-  update_field('genres', 'Not available', $movie_post_id); // Text
+    // Convert genres array to a comma-separated string
+    $genres = implode(', ', $genres);
+    // Save the genres as a custom field on the movie post
+    if (!empty($genres)) {
+      update_field('genres', $genres, $movie_post_id); // Text
+    } else {
+      update_field('genres', 'Not available', $movie_post_id); // Text
 
-
-
-}
-
-
-
-
-
-
-
+    }
 
 
     // Production Companies
@@ -112,13 +102,6 @@ if (!empty($genres)) {
     }
     $production_companies = implode(', ', $production_companies);
     update_field('production_companies', $production_companies, $movie_post_id);
-
-// test=================
-
-
-
-
-
 
     // Actors
     $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
@@ -187,10 +170,15 @@ if (!empty($genres)) {
         // Save the cast images as a custom field on the actors post type
         update_field('images_file_path', $images_file_path, $actor_post_id); // Text
 
+        // Trailer
+        // Url api -> https://api.themoviedb.org/3/movie/movie_id/videos?language=en-US'
+        $trailer_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/videos?api_key={$api_key}&language=en-US");
+        $trailer_data = json_decode(wp_remote_retrieve_body($trailer_response), true);
 
-
-
-
+        echo '<pre>';
+        var_dump($trailer_data);
+        die();
+        
 
 
       }
