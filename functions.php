@@ -174,6 +174,7 @@ function import_movie_with_cast($movie_id)
     $cast_names = [];
     if (!empty($actors_data['cast'])) {
       // Collect all actor IDs that don't exist yet to fetch their details in batch
+      
       $new_actors = [];
       foreach ($actors_data['cast'] as $actor) {
         // Check if actor already exists by tmdb_actor_id
