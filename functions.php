@@ -109,7 +109,7 @@ function import_movie_with_cast($movie_id)
 
     // Save the trailer key as a custom field on the movie post
     if (!empty($trailer_key)) {
-      update_field('trailer_key', $trailer_key, $movie_post_id); // Text
+      update_field('trailer', $trailer_key, $movie_post_id); // Text
     } else {
       update_field('trailer', 'Not available', $movie_post_id); // Text
     }
