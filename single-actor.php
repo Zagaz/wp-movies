@@ -85,7 +85,7 @@ if (have_posts()) :
         </div>
     </div>
     <?php // The movie list will be rendered here ?> 
-    <div id="actor-movie-credits" class="mt-8"></div>
+    <div id="actor-movie-credits" class="mt-8 bg-gray-700 p-10"></div>
 </div>
 
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!Array.isArray(movies) || movies.length === 0) return;
         const container = document.getElementById('actor-movie-credits');
         container.innerHTML = `
-            <h2 class="text-2xl font-semibold mb-2 text-gray-800">Movie Credits</h2>
+            <h2 class="text-2xl font-semibold mb-2 text-white">Movie Credits</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 ${movies.map(movie => `
                     <div class="bg-gray-50 rounded shadow p-4 flex flex-col items-center">
