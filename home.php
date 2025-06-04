@@ -64,9 +64,7 @@
                             <?php if ($production_companies): ?>
                                 <p class="text-gray-500 text-sm mb-1">Production: <?php echo esc_html($production_companies); ?></p>
                             <?php endif; ?>
-                            <?php if ($original_language): ?>
-                                <p class="text-gray-500 text-sm mb-1">Language: <?php echo esc_html($original_language); ?></p>
-                            <?php endif; ?>
+                            
                             <?php if ($overview): ?>
                                 <p class="text-gray-600 mt-2"><?php echo esc_html($overview); ?></p>
                             <?php endif; ?>
