@@ -29,6 +29,7 @@
                 $cast = get_field('cast');
                 $crew = get_field('crew');
                 $image_url = 'https://image.tmdb.org/t/p/w500';
+                $image_placeholder = get_site_url().'/wp-content/uploads/2025/06/red_carpet-1.jpg';
 
                 // All cards have the same class (no special span for the first)
                 $item_class = 'bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300';
@@ -36,7 +37,21 @@
                 <div class="<?php echo $item_class; ?>">
                     <a href="<?php the_permalink(); ?>" class="block">
                         <div style="aspect-ratio:2/3;" class="w-full">
-                            <img src="<?php echo esc_url($image_url . $poster_url); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
+                            <?php 
+                            if (empty($poster_url)) {
+                                // If no poster, use placeholder image
+                                $poster = $image_placeholder;
+                            } else {
+                                // Ensure poster URL is valid
+                                $poster = $image_url . $poster_url;
+                            }
+                            
+                            ?>
+
+                            <img src="<?php echo esc_url($image_url . $poster); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
+                        
+                        
+                        
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
