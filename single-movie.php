@@ -17,15 +17,14 @@ if (have_posts()) :
         $production_companies = get_field('production_companies');
         $movie_popularity = number_format((float)get_field('movie_popularity'), 2, '.', '');
         $similar_movies = get_field('similar_movies');
-        $alternative_titles = get_field ('alternative_titles');
+        $alternative_titles = get_field('alternative_titles');
 
-        
-        
+
+
 
 
 ?>
         <div class="movie-detail">
-            <h1><?php the_title(); ?></h1>
             <?php if ($poster_url): ?>
                 <?php
                 $image_url = 'https://image.tmdb.org/t/p/w500';
@@ -34,33 +33,32 @@ if (have_posts()) :
                 <img src="<?php echo esc_url($image_url . $poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
             <?php endif; ?>
 
-            <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
-            <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
-            <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
-            <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
-            <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
-            <p><strong>Popularity:</strong> <?php echo esc_html( $movie_popularity ); ?></p>
-            <p><strong>Similar Movies:</strong> <?php echo esc_html( $similar_movies ); ?></p>
             
-            
-            
-            <p><strong>Actors:</strong></p>
-            <?php
-            foreach ($cast as $actor) {
-                $url = get_site_url() . '/actor/' . sanitize_title($actor);
-                echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
-            }
-            ?>
+                <p><strong>Title:</strong><?php the_title(); ?></p>
+                <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
+                <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
+                <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
+                <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
+                <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
+                <p><strong>Popularity:</strong> <?php echo esc_html($movie_popularity); ?></p>
+                <p><strong>Similar Movies:</strong> <?php echo esc_html($similar_movies); ?></p>
+                <p><strong>Actors:</strong></p>
+                <?php
+                foreach ($cast as $actor) {
+                    $url = get_site_url() . '/actor/' . sanitize_title($actor);
+                    echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
+                }
+                ?>
 
-<?php // This is trailer 
-            ?>
-            <p><strong>Alternative Titles:</strong> <?php echo esc_html( $alternative_titles ); ?></p>
-            <p><strong>Trailer:</strong></p>
-            <?php if ($trailer): ?>
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
-            <?php else: ?>
-                <p>No trailer available.</p>
-            <?php endif; ?>
+                <?php // This is trailer 
+                ?>
+                <p><strong>Alternative Titles:</strong> <?php echo esc_html($alternative_titles); ?></p>
+                <p><strong>Trailer:</strong></p>
+                <?php if ($trailer): ?>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
+                <?php else: ?>
+                    <p>No trailer available.</p>
+                <?php endif; ?>
 
 
 
