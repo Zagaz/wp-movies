@@ -60,14 +60,21 @@ function import_movie_with_cast($movie_id)
     ]);
 
     if (is_wp_error($movie_post_id)) continue;
+    echo '<pre>';
+
+    var_dump($movie);
+    die();
 
  
     // Save the movie's TMDB ID and other details
-    update_field('tmdb_id', $movie['id'] ?? '', $movie_post_id);
-    update_field('release_date', $movie['release_date'] ?? '', $movie_post_id);
-    update_field('poster_url', $movie['poster_path'] ?? '', $movie_post_id);
-    update_field('production_companies', $movie['production_companies'] ?? '', $movie_post_id);
-    update_field('original_language', $movie['original_language'] ?? '', $movie_post_id);
+    update_field('tmdb_id', $movie['id'] ?? 'n/a', $movie_post_id);
+    update_field('release_date', $movie['release_date'] ?? 'n/a', $movie_post_id);
+    update_field('poster_url', $movie['poster_path'] ?? 'n/a', $movie_post_id);
+    update_field('production_companies', $movie['production_companies'] ?? 'n/a', $movie_post_id);
+    update_field('original_language', $movie['original_language'] ?? 'n/a', $movie_post_id);
+    update_field('popularity', $movie['popularity'] ?? 'n/a', $movie_post_id);
+
+
 
 
     // Production Companies

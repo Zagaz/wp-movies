@@ -8,7 +8,7 @@ if (have_posts()) :
         $poster_url   = get_field('poster_url');
         $release_date = get_field('release_date');
         $genre        = get_field('genres');
-        $overview     = get_field('overview');
+        $overview = get_the_content();
         $production_companies = get_field('production_companies');
         $original_language = get_field('original_language');
         $cast = get_field('cast');
