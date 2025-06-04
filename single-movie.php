@@ -14,6 +14,7 @@ if (have_posts()) :
         $cast = get_field('cast');
         $crew = get_field('crew');
         $trailer = get_field('trailer');
+        $production_companies = get_field('production_companies');
 ?>
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
@@ -28,14 +29,8 @@ if (have_posts()) :
             <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
             <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
             <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
-
             <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
-
-
-
-
             <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
-
             <p><strong>Actors:</strong></p>
             <?php
             foreach ($cast as $actor) {
@@ -43,12 +38,11 @@ if (have_posts()) :
                 echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
             }
             ?>
-        
 
-
-            <?php // This is trailer ?>
+            <?php // This is trailer 
+            ?>
             <p><strong>Trailer:</strong></p>
-            <?php if ($trailer ): ?>
+            <?php if ($trailer): ?>
                 <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
             <?php else: ?>
                 <p>No trailer available.</p>

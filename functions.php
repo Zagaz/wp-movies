@@ -22,8 +22,11 @@ function import_movie_with_cast($movie_id)
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
   $movies_res = $movie_data['results'] ?? [];
 
+
   // just keep the first 10 movies
   $movies = array_slice($movies_res, 0, 10);
+
+
 
   foreach ($movies as $movie) {
     // Defensive: skip if no title or overview
@@ -58,6 +61,7 @@ function import_movie_with_cast($movie_id)
 
     if (is_wp_error($movie_post_id)) continue;
 
+ 
     // Save the movie's TMDB ID and other details
     update_field('tmdb_id', $movie['id'] ?? '', $movie_post_id);
     update_field('release_date', $movie['release_date'] ?? '', $movie_post_id);
@@ -66,11 +70,33 @@ function import_movie_with_cast($movie_id)
     update_field('original_language', $movie['original_language'] ?? '', $movie_post_id);
 
 
+    // Production Companies
+    //https://api.themoviedb.org/3/movie/movie_id?language=en-US
+    $production_companies_res = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}?language=en-US&api_key={$api_key}");
+    $production_companies_data = json_decode(wp_remote_retrieve_body($production_companies_res), true);
+    $production_companies_list = $production_companies_data['production_companies'] ?? [];
+
+    // loop through the production companies and save them as a custom field
+    $production_companies_names = [];
+    foreach ($production_companies_list as $company) {
+      $production_companies_names[] = $company['name'] ?? '';
+    }
+    // Convert the array to a comma-separated string
+    $production_companies_string = implode(', ', $production_companies_names);
+    // Save the production companies as a custom field on the movie post
+    if (!empty($production_companies_string)) {
+      update_field('production_companies', $production_companies_string, $movie_post_id); // Text
+    } else {
+      update_field('production_companies', 'Not available', $movie_post_id); // Text
+    }
+ 
+
+
+// GENRES
+
     $genres_ids = $movie['genre_ids'] ?? [];
 
-
-
-    // using this id's fetch the name of the genre and compare to $genres_ids
+    // Use this id's to fetch the name of the genre and compare to $genres_ids
     $genre_url = "https://api.themoviedb.org/3/genre/movie/list?language=en-US&api_key={$api_key}";
     $genre_response = wp_remote_get($genre_url);
     $genre_data = json_decode(wp_remote_retrieve_body($genre_response), true);
@@ -91,6 +117,10 @@ function import_movie_with_cast($movie_id)
       update_field('genres', 'Not available', $movie_post_id); // Text
 
     }
+
+   
+
+
 
     //trailer 
     // url https://api.themoviedb.org/3/movie/movie_id/videos?language=en-US'
@@ -121,15 +151,7 @@ function import_movie_with_cast($movie_id)
     
 
 
-    // Production Companies
-    $production_companies = [];
-    if (!empty($movie['production_companies'])) {
-      foreach ($movie['production_companies'] as $company) {
-        $production_companies[] = $company['name'];
-      }
-    }
-    $production_companies = implode(', ', $production_companies);
-    update_field('production_companies', $production_companies, $movie_post_id);
+
 
     // Actors
     $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
