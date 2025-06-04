@@ -107,14 +107,15 @@ function import_movie_with_cast($movie_id)
       }
     }
 
+    $trailer_status ='';
     // Save the trailer key as a custom field on the movie post
     if (!empty($trailer_key)) {
-      update_field('trailer', $trailer_key, $movie_post_id); // Text
+      $trailer_status=$trailer_key;
     } else {
-      update_field('trailer', 'Not available', $movie_post_id); // Text
+      $trailer_status = 'Not available';
     }
     
-   
+   update_field('trailer', $trailer_status, $movie_post_id);
 
 
     
