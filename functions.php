@@ -147,9 +147,14 @@ function import_movie_with_cast($movie_id)
     
    update_field('trailer', $trailer_status, $movie_post_id);
 
+   // SIMILAR MOVIES
 
-    
+   $url_similar_movies = "https://api.themoviedb.org/3/movie/{$movie['id']}/similar?language=en-US&page=1&api_key={$api_key}";
 
+   echo '<pre>';
+   var_dump($url_similar_movies);
+   echo '</pre>';
+   die();
 
 
 
