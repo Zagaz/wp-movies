@@ -12,7 +12,7 @@
             'meta_key' => 'release_date',
             'orderby' => 'meta_value',
             'order' => 'DESC',
-            
+
         );
         $movies = new WP_Query($args);
         if ($movies->have_posts()) :
@@ -29,15 +29,15 @@
                 $cast = get_field('cast');
                 $crew = get_field('crew');
                 $image_url = 'https://image.tmdb.org/t/p/w500';
-                $image_placeholder = get_site_url().'/wp-content/uploads/2025/06/red_carpet-1.jpg';
+                $image_placeholder = get_site_url() . '/wp-content/uploads/2025/06/red_carpet-1.jpg';
 
                 // All cards have the same class (no special span for the first)
                 $item_class = 'bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300';
-                ?>
+        ?>
                 <div class="<?php echo $item_class; ?>">
                     <a href="<?php the_permalink(); ?>" class="block">
                         <div style="aspect-ratio:2/3;" class="w-full">
-                            <?php 
+                            <?php
                             if (empty($poster_url)) {
                                 // If no poster, use placeholder image
                                 $poster = $image_placeholder;
@@ -45,13 +45,13 @@
                                 // Ensure poster URL is valid
                                 $poster = $image_url . $poster_url;
                             }
-                            
+
                             ?>
 
                             <img src="<?php echo esc_url($image_url . $poster); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
-                        
-                        
-                        
+
+
+
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
@@ -79,7 +79,7 @@
             <p class="text-gray-600">No movies found.</p>
         <?php endif; ?>
     </div>
-     <h2 class="text-3xl font-bold text-gray-800 mb-4">Top 10 popular actors</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Top 10 popular actors</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         <?php
         $args = array(
@@ -90,26 +90,35 @@
             'orderby' => 'meta_value_num',
             'order' => 'DESC',
 
-                    );
+        );
         $image_url = 'https://image.tmdb.org/t/p/w500';
         $actors = new WP_Query($args);
         if ($actors->have_posts()) :
             while ($actors->have_posts()) : $actors->the_post();
                 $actor_image = get_field('profile_path');
-                ?>
+        ?>
                 <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
                     <a href="<?php the_permalink(); ?>" class="block">
                         <div style="aspect-ratio:1/1;" class="w-full">
-                            <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" /> 
+                            <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
-                            
+
                         </div>
                         <div>
                             <h3 class=" p-3
                             
-                            "><?php echo get_field('popularity') ?> </h3>
+                            "><?php
+                                // make sure to get the popularity field a 0.00 format
+                                $popularity = get_field('popularity');
+                                if ($popularity) {
+                                    echo number_format($popularity, 2);
+                                } else {
+                                    echo 'N/A';
+                                }
+
+                                ?> </h3>
 
                         </div>
                     </a>
@@ -119,6 +128,7 @@
         else : ?>
             <p class="text-gray-600">No actors found.</p>
         <?php endif; ?>
+    </div>
 
 
-<?php get_footer(); ?>
+    <?php get_footer(); ?>
