@@ -43,8 +43,8 @@ if (have_posts()) :
             <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
             <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
             <p><strong>Popularity:</strong> <?php echo esc_html($movie_popularity); ?></p>
-            <p><strong>Similar Movies:</strong> <?php echo esc_html($similar_movies); ?></p>
-            <p><strong>Actors:</strong></p>
+            <p><strong>List of similar movies:</strong> <?php echo esc_html($similar_movies); ?></p>
+            <p><strong>Cast:</strong></p>
             <?php
             foreach ($cast as $actor) {
                 $url = get_site_url() . '/actor/' . sanitize_title($actor);
