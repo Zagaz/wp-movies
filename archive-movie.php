@@ -6,21 +6,35 @@ get_header();
     <h1 class="text-3xl font-bold text-gray-800 mb-6">All Movies</h1>
 
     <!-- Filter Form -->
-    <form method="get" class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <input type="text" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by title..." class="border rounded px-3 py-2">
-        <input type="text" name="year" value="<?php echo esc_attr(get_query_var('year')); ?>" placeholder="Year..." class="border rounded px-3 py-2">
-        <input type="text" name="genre" value="<?php echo esc_attr(get_query_var('genre')); ?>" placeholder="Genre..." class="border rounded px-3 py-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+    <form method="get" class="mb-8 flex flex-col md:flex-row md:items-end gap-4">
+        <div class="flex-1">
+            <label class="block text-gray-700 mb-1" for="filter-title">Title</label>
+            <input type="text" id="filter-title" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by title..." class="border rounded px-3 py-2 w-full">
+        </div>
+        <div class="flex-1">
+            <label class="block text-gray-700 mb-1" for="filter-year">Year</label>
+            <input type="text" id="filter-year" name="year" value="<?php echo isset($_GET['year']) ? esc_attr($_GET['year']) : ''; ?>" placeholder="e.g. 2025" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div class="flex-1">
+            <label class="block text-gray-700 mb-1" for="filter-genre">Genre</label>
+            <input type="text" id="filter-genre" name="genre" value="<?php echo esc_attr(get_query_var('genre')); ?>" placeholder="e.g. Action" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div class="flex flex-col gap-2">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Filter</button>
+            <?php if (!empty($_GET['s']) || !empty($_GET['year']) || !empty($_GET['genre'])): ?>
+                <a href="<?php echo esc_url(get_post_type_archive_link('movie')); ?>" class="bg-gray-300 text-gray-800 px-4 py-2 rounded text-center w-full">Clear All</a>
+            <?php endif; ?>
+        </div>
     </form>
 
     <?php
     // Build meta_query for year and genre
     $meta_query = [];
-    if (!empty($_GET['year'])) {
+    if (isset($_GET['year']) && $_GET['year'] !== '') {
         $meta_query[] = [
             'key' => 'release_date',
-            'value' => $_GET['year'],
-            'compare' => 'LIKE'
+            'value' => '^' . preg_quote($_GET['year'], '/') . '-',
+            'compare' => 'REGEXP'
         ];
     }
     if (!empty($_GET['genre'])) {
