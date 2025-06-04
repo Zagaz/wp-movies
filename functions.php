@@ -97,9 +97,27 @@ function import_movie_with_cast($movie_id)
     $trailer_url = "https://api.themoviedb.org/3/movie/{$movie['id']}/videos?language=en-US&api_key={$api_key}";
     $trailer_response = wp_remote_get($trailer_url);
     $trailer_data = json_decode(wp_remote_retrieve_body($trailer_response), true);
-    echo '<pre>';
-    print_r($trailer_data);
-    die();
+    $trailer_key = '';
+    if (!empty($trailer_data['results'])) {
+      foreach ($trailer_data['results'] as $video) {
+        if ($video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
+          $trailer_key = $video['key'];
+          break; // Stop after finding the first trailer
+        }
+      }
+    }
+
+    // Save the trailer key as a custom field on the movie post
+    if (!empty($trailer_key)) {
+      update_field('trailer_key', $trailer_key, $movie_post_id); // Text
+    } else {
+      update_field('trailer', 'Not available', $movie_post_id); // Text
+    }
+    
+   
+
+
+    
 
 
     // Production Companies
