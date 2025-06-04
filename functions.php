@@ -236,7 +236,7 @@ function import_movie_with_cast($movie_id)
         $cast_ids[] = $actor_post_id;
 
         // Actors Images
-        $url_images = "https://api.themoviedb.org/3/person/287/images?api_key={$api_key}";
+        $url_images = "https://api.themoviedb.org/3/person/{$actor['id']}/images?api_key={$api_key}";
         $images_response = wp_remote_get($url_images);
         $images_data = json_decode(wp_remote_retrieve_body($images_response), true);
         $images = $images_data['profiles'] ?? [];
