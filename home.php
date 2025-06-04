@@ -104,6 +104,13 @@
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
+                            
+                        </div>
+                        <div>
+                            <h3 class=" p-3
+                            
+                            "><?php echo get_field('popularity') ?> </h3>
+
                         </div>
                     </a>
                 </div>
