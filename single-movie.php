@@ -1,10 +1,12 @@
 <?php
 get_header(); // Load header
+  $api_key = '9facf375ac53c66a77dfa59841360240';
 
 if (have_posts()) :
     while (have_posts()) : the_post();
 
         // Get ACF fields
+        $tmdb_id = get_field('tmdb_id');
         $poster_url   = get_field('poster_url');
         $release_date = get_field('release_date');
         $genre        = get_field('genres');
@@ -24,7 +26,7 @@ if (have_posts()) :
 
 
 ?>
-        <div class="movie-detail">
+        <div class="movie-detail px-30">
             <?php if ($poster_url): ?>
                 <?php
                 $image_url = 'https://image.tmdb.org/t/p/w500';
@@ -33,32 +35,58 @@ if (have_posts()) :
                 <img src="<?php echo esc_url($image_url . $poster_url) ?>" alt="<?php the_title(); ?>" style="max-width: 300px;">
             <?php endif; ?>
 
-            
-                <p><strong>Title:</strong><?php the_title(); ?></p>
-                <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
-                <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
-                <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
-                <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
-                <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
-                <p><strong>Popularity:</strong> <?php echo esc_html($movie_popularity); ?></p>
-                <p><strong>Similar Movies:</strong> <?php echo esc_html($similar_movies); ?></p>
-                <p><strong>Actors:</strong></p>
-                <?php
-                foreach ($cast as $actor) {
-                    $url = get_site_url() . '/actor/' . sanitize_title($actor);
-                    echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
-                }
-                ?>
 
+            <h2 class="text-4xl font-bold"><?php the_title(); ?></h2>
+            <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
+            <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
+            <p><strong>Overview: </strong><?php echo esc_html($overview); ?></p>
+            <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
+            <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
+            <p><strong>Popularity:</strong> <?php echo esc_html($movie_popularity); ?></p>
+            <p><strong>Similar Movies:</strong> <?php echo esc_html($similar_movies); ?></p>
+            <p><strong>Actors:</strong></p>
+            <?php
+            foreach ($cast as $actor) {
+                $url = get_site_url() . '/actor/' . sanitize_title($actor);
+                echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
+            }
+            ?>
+            <div class="video-wrapper">
                 <?php // This is trailer 
                 ?>
-                <p><strong>Alternative Titles:</strong> <?php echo esc_html($alternative_titles); ?></p>
+                <p><strong>Alternative Titles:</strong><br> <?php echo esc_html($alternative_titles); ?></p>
+                <br>
                 <p><strong>Trailer:</strong></p>
                 <?php if ($trailer): ?>
                     <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
                 <?php else: ?>
                     <p>No trailer available.</p>
                 <?php endif; ?>
+            </div>
+            <div class="reviews-wrapper  mt-10 mb-20">
+                <h1 class="
+                text-2xl font-bold
+                ">Reviews</h1>
+                <?php
+                $review_url = "https://api.themoviedb.org/3/movie/{$tmdb_id}/reviews?language=en-US&page=1&api_key={$api_key}";
+                $review_res = json_decode( wp_remote_get( $review_url )['body'] );
+                if ( ! empty( $review_res->results ) ) {
+                    foreach ( $review_res->results as $review ) {
+                ?>
+                        <div class="review">
+                            <p><strong><?php echo esc_html( $review->author ); ?>:</strong></p>
+                            <p><?php echo esc_html( $review->content ); ?></p>
+                        </div>
+                <?php
+                    }
+                } else {
+                ?>
+                    <p>No reviews found.</p>
+                <?php
+                }
+                ?>
+
+            </div>
 
 
 
