@@ -22,7 +22,7 @@
                 // Get ACF fields
                 $poster_url   = get_field('poster_url');
                 $release_date = get_field('release_date');
-                $genre        = get_field('genres');
+                $genres        = get_field('genres');
                 $overview     = get_field('overview');
                 $production_companies = get_field('production_companies');
                 $original_language = get_field('original_language');
@@ -58,8 +58,8 @@
                             <?php if ($release_date): ?>
                                 <p class="text-gray-500 text-sm mb-1">Release: <?php echo esc_html($release_date); ?></p>
                             <?php endif; ?>
-                            <?php if ($genre): ?>
-                                <p class="text-gray-500 text-sm mb-1">Genre: <?php echo esc_html($genre); ?></p>
+                            <?php if ($genres): ?>
+                                <p class="text-gray-500 text-sm mb-1">Genre: <?php echo esc_html($genres); ?></p>
                             <?php endif; ?>
                             <?php if ($production_companies): ?>
                                 <p class="text-gray-500 text-sm mb-1">Production: <?php echo esc_html($production_companies); ?></p>
@@ -106,6 +106,7 @@
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
 
                         </div>
+                   
                         <div>
                             <h3 class=" p-3
                             
