@@ -7,13 +7,13 @@ if (have_posts()) :
         // Get ACF fields
         $poster_url   = get_field('poster_url');
         $release_date = get_field('release_date');
-        $genre        = get_field('genre');
+        $genre        = get_field('genres');
         $overview     = get_field('overview');
         $production_companies = get_field('production_companies');
         $original_language = get_field('original_language');
         $cast = get_field('cast');
         $crew = get_field('crew');
-        $tmdb_id = get_field('tmdb_id');
+        $trailer = get_field('trailer');
 ?>
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
@@ -28,7 +28,12 @@ if (have_posts()) :
             <p><strong>Release Date:</strong> <?php echo esc_html($release_date); ?></p>
             <p><strong>Genre:</strong> <?php echo esc_html($genre); ?></p>
             <p><strong>Overview:</strong><br><?php echo esc_html($overview); ?></p>
+
             <p><strong>Production Companies:</strong> <?php echo esc_html($production_companies); ?></p>
+
+
+
+
             <p><strong>Original Language:</strong> <?php echo esc_html($original_language); ?></p>
 
             <p><strong>Actors:</strong></p>
@@ -38,14 +43,17 @@ if (have_posts()) :
                 echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
             }
             ?>
-            <p><strong>Cast:</strong></p>
-            <?php
-            foreach ($crew as $crewmember) {
-                echo $crewmember . ', ';
-            }
-            ?>
+        
+
 
             <?php // This is trailer ?>
+            <p><strong>Trailer:</strong></p>
+            <?php if ($trailer ): ?>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
+            <?php else: ?>
+                <p>No trailer available.</p>
+            <?php endif; ?>
+
 
 
         </div>
