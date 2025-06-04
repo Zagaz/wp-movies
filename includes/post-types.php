@@ -25,7 +25,7 @@ function register_actor_post_type() {
             'singular_name' => 'Actor'
         ),
         'public' => true,
-        'has_archive' => false,
+         'has_archive' => true,
           'menu_icon' => 'dashicons-universal-access-alt',
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_rest' => true,
