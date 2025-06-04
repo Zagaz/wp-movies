@@ -70,7 +70,7 @@ if (have_posts()) :
             <h2 class="text-2xl font-semibold mb-2 text-gray-800">Image Gallery</h2>
             <?php if ($images_file_path && is_array($images_file_path) && count($images_file_path) > 0): ?>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                    <?php foreach (array_slice($images_file_path, 0, 10) as $image): ?>
+                    <?php foreach (array_slice($images_file_path, 1, 10) as $image): ?>
                         <div class="bg-gray-50 rounded shadow p-4 flex flex-col items-center">
                             <img
                                 src="<?php echo esc_url($image_url . $image); ?>"
