@@ -149,23 +149,37 @@ function import_movie_with_cast($movie_id)
 
    // SIMILAR MOVIES
 
-//https://api.themoviedb.org/3/movie/550/similar?api_key=YOUR_API_KEY&language=en-US&page=1
-
-
    $url_similar_movies = "https://api.themoviedb.org/3/movie/{$movie['id']}/similar?api_key={$api_key}&language=en-US&page=1";
    $similar_res = wp_remote_get($url_similar_movies);
    $similar_data = json_decode(wp_remote_retrieve_body($similar_res), true);
    // loop $similar_data
    $similar_movies = [];
    foreach ($similar_data['results'] as $similar_movie) {
-     $similar_movie_id = $similar_movie['id'] ?? '';
      $similar_movie_title = $similar_movie['title'] ?? '';
-      $similar_movies[] = $similar_movie_title;
+     $similar_movies[] = $similar_movie_title;
    }
-
-    // convert $similar_movies into string comma separated
    $similar_movies_string = implode(', ', $similar_movies);
    update_field('similar_movies', $similar_movies_string, $movie_post_id);
+   
+   // Alternative Titles
+   //http GET https://api.themoviedb.org/3/movie/movie_id/alternative_titles
+   $url_alternative_titles_res ="https://api.themoviedb.org/3/movie/{$movie['id']}/alternative_titles?api_key={$api_key}&language=en-US";
+   $alternative_titles_response = wp_remote_get($url_alternative_titles_res);
+   $alternative_titles_data = json_decode(wp_remote_retrieve_body($alternative_titles_response), true);
+   $alternative_titles = [];
+   if (!empty($alternative_titles_data['titles'])) {
+     foreach ($alternative_titles_data['titles'] as $title) {
+       $alternative_titles[] = $title['title'] ?? '';
+     }
+   }
+   // Convert the array to a comma-separated string
+   $alternative_titles_string = implode(', ', $alternative_titles);
+   // Save the alternative titles as a custom field on the movie post
+   if (!empty($alternative_titles_string)) {
+     update_field('alternative_titles', $alternative_titles_string, $movie_post_id); // Text
+   } else {
+     update_field('alternative_titles', 'Not available', $movie_post_id); // Text
+   }
 
     // Actors
     $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
@@ -174,7 +188,7 @@ function import_movie_with_cast($movie_id)
     $cast_names = [];
     if (!empty($actors_data['cast'])) {
       // Collect all actor IDs that don't exist yet to fetch their details in batch
-      
+
       $new_actors = [];
       foreach ($actors_data['cast'] as $actor) {
         // Check if actor already exists by tmdb_actor_id
