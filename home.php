@@ -74,7 +74,7 @@
             'meta_key' => 'popularity',
             'orderby' => 'meta_value_num',
             'order' => 'DESC',
-            
+
                     );
         $image_url = 'https://image.tmdb.org/t/p/w500';
         $actors = new WP_Query($args);
@@ -85,8 +85,7 @@
                 <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
                     <a href="<?php the_permalink(); ?>" class="block">
                         <div style="aspect-ratio:1/1;" class="w-full">
-                            <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" />
-                            <?php echo esc_html(get_field('biography')); ?>
+                            <img src="<?php echo esc_url($image_url . $actor_image); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover rounded-t-lg w-full h-full" /> 
                         </div>
                         <div class="p-4">
                             <h3 class="text-xl font-semibold text-gray-800"><?php the_title(); ?></h3>
