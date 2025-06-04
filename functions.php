@@ -15,21 +15,15 @@ function import_movie_with_cast($movie_id)
   //todo
   $api_key = '9facf375ac53c66a77dfa59841360240';
 
-  // Fetch up-coming movie data from TMDB API
-  // https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US
 
   $url = "https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US";
-
   $url2 = "https://api.themoviedb.org/3/discover/movie?&primary_release_date.gte=2025-06-03&language=en-US&api_key={$api_key} ";
-
   $movie_response = wp_remote_get($url2);
-
   $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
   $movies_res = $movie_data['results'] ?? [];
 
   // just keep the first 10 movies
   $movies = array_slice($movies_res, 0, 10);
-
 
   foreach ($movies as $movie) {
     // Defensive: skip if no title or overview
@@ -64,15 +58,14 @@ function import_movie_with_cast($movie_id)
 
     if (is_wp_error($movie_post_id)) continue;
 
-
-    // Now use $movie['id'], $movie['release_date'], etc.
+    // Save the movie's TMDB ID and other details
     update_field('tmdb_id', $movie['id'] ?? '', $movie_post_id);
     update_field('release_date', $movie['release_date'] ?? '', $movie_post_id);
     update_field('poster_url', $movie['poster_path'] ?? '', $movie_post_id);
     update_field('production_companies', $movie['production_companies'] ?? '', $movie_post_id);
     update_field('original_language', $movie['original_language'] ?? '', $movie_post_id);
 
-    // genres
+    // GENRES
 
     $genres_data = wp_remote_get($url);
     $genres_data = json_decode(wp_remote_retrieve_body($genres_data), true);
@@ -85,18 +78,6 @@ function import_movie_with_cast($movie_id)
 
     $genres = implode(', ', $genres);
     update_field('genres', $genres, $movie_post_id); // Text
-
-
-
-
-
-
-
-
-
-
-
-
 
     // Production Companies
     $production_companies = [];
@@ -111,21 +92,9 @@ function import_movie_with_cast($movie_id)
 
 
     // Actors
-
-
-
     $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
-
-    echo '<pre>';
-    //var_dump($actors_response['body']); 
-    // convert $actors_response['body'] to json
     $actors_response['body'] = json_decode($actors_response['body'], true);
-
-
     $actors_data =   $actors_response['body'];
-
-
-
     $cast_names = [];
     if (!empty($actors_data['cast'])) {
       // Collect all actor IDs that don't exist yet to fetch their details in batch
@@ -170,13 +139,8 @@ function import_movie_with_cast($movie_id)
         $cast_names[] = $actor['name'];
         $cast_ids[] = $actor_post_id;
 
-
-
-
         // Actors Images
-
         $url_images = "https://api.themoviedb.org/3/person/287/images?api_key={$api_key}";
-
         $images_response = wp_remote_get($url_images);
         $images_data = json_decode(wp_remote_retrieve_body($images_response), true);
         $images = $images_data['profiles'] ?? [];
@@ -191,14 +155,6 @@ function import_movie_with_cast($movie_id)
             }
           }
         }
-
-
-
-
-
-
-
-
         // Save the cast images as a custom field on the actors post type
         update_field('images_file_path', $images_file_path, $actor_post_id); // Text
 
