@@ -225,6 +225,7 @@ function import_movie_with_cast($movie_id)
             'post_id' => $actor_post_id,
             'profile_path' => $actor['profile_path'] ?? '',
             'popularity' => $actor['popularity'] ?? '',
+           
           ];
         }
 

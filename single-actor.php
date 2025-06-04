@@ -15,6 +15,7 @@ if (have_posts()) :
     while (have_posts()) : the_post(); 
 
         // ACF Fields
+        $tmdb_actor_id = get_field('tmdb_actor_id');
         $name = get_the_title();
         $bio = get_field('biography');
         $photo = get_field('profile_path');
@@ -23,6 +24,8 @@ if (have_posts()) :
         $place_of_birth = get_field('place_of_birth') ?: 'Not Available';
         $homepage = get_field('homepage');
         $popularity = get_field('popularity');
+        $homepage= get_field('homepage');
+        $images_file_path = get_field('images_file_path');
 
         // Profile image base URL
         $image_url = 'https://image.tmdb.org/t/p/w500';
