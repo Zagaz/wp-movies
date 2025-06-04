@@ -94,6 +94,7 @@
             'order' => 'DESC',
         );
         $image_url = 'https://image.tmdb.org/t/p/w500';
+        $image_placeholder = get_site_url() . '/wp-content/uploads/2025/06/red_carpet-1.jpg';
         $actors = new WP_Query($args);
         if ($actors->have_posts()) :
             while ($actors->have_posts()) : $actors->the_post();
