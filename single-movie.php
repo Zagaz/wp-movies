@@ -13,6 +13,7 @@ if (have_posts()) :
         $original_language = get_field('original_language');
         $cast = get_field('cast');
         $crew = get_field('crew');
+        $tmdb_id = get_field('tmdb_id');
 ?>
         <div class="movie-detail">
             <h1><?php the_title(); ?></h1>
@@ -35,32 +36,18 @@ if (have_posts()) :
             foreach ($cast as $actor) {
                 $url = get_site_url() . '/actor/' . sanitize_title($actor);
                 echo '<a href="' . esc_url($url) . '">' . esc_html($actor) . '</a>, ';
-              
             }
-
-
             ?>
-
-            
-            
-
-            
-
-    
-                
-           
-            
             <p><strong>Cast:</strong></p>
-                   <?php
+            <?php
             foreach ($crew as $crewmember) {
-                echo $crewmember. ', ';
-              
+                echo $crewmember . ', ';
             }
-
-
             ?>
 
-           
+            <?php // This is trailer ?>
+
+
         </div>
 
 <?php
