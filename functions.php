@@ -149,14 +149,23 @@ function import_movie_with_cast($movie_id)
 
    // SIMILAR MOVIES
 
-   $url_similar_movies = "https://api.themoviedb.org/3/movie/{$movie['id']}/similar?language=en-US&page=1&api_key={$api_key}";
-
-   echo '<pre>';
-   var_dump($url_similar_movies);
-   echo '</pre>';
-   die();
+//https://api.themoviedb.org/3/movie/550/similar?api_key=YOUR_API_KEY&language=en-US&page=1
 
 
+   $url_similar_movies = "https://api.themoviedb.org/3/movie/{$movie['id']}/similar?api_key={$api_key}&language=en-US&page=1";
+   $similar_res = wp_remote_get($url_similar_movies);
+   $similar_data = json_decode(wp_remote_retrieve_body($similar_res), true);
+   // loop $similar_data
+   $similar_movies = [];
+   foreach ($similar_data['results'] as $similar_movie) {
+     $similar_movie_id = $similar_movie['id'] ?? '';
+     $similar_movie_title = $similar_movie['title'] ?? '';
+      $similar_movies[] = $similar_movie_title;
+   }
+
+    // convert $similar_movies into string comma separated
+   $similar_movies_string = implode(', ', $similar_movies);
+   update_field('similar_movies', $similar_movies_string, $movie_post_id);
 
     // Actors
     $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
