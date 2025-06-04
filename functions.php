@@ -63,8 +63,11 @@ function import_movie_with_cast($movie_id)
       ]);
 
       if (is_wp_error($movie_post_id)) continue;
-
       
+      // movie genres -> genre_ids
+
+
+     
 
       // Now use $movie['id'], $movie['release_date'], etc.
       update_field('tmdb_id', $movie['id'] ?? '', $movie_post_id);
@@ -72,6 +75,8 @@ function import_movie_with_cast($movie_id)
       update_field('poster_url', $movie['poster_path'] ?? '', $movie_post_id);
       update_field('production_companies', $movie['production_companies'] ?? '', $movie_post_id);
       update_field('original_language', $movie['original_language'] ?? '', $movie_post_id);
+
+
 
       // Genres
       $genres = [];
@@ -82,6 +87,11 @@ function import_movie_with_cast($movie_id)
       }
       $genres = implode(', ', $genres);
       update_field('genres', $genres, $movie_post_id);
+
+
+
+
+
 
       // Production Companies
       $production_companies = [];
