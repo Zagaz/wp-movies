@@ -84,16 +84,11 @@ if (have_posts()) :
             <?php endif; ?>
         </div>
     </div>
-
-
-
-    
-
- 
+    <?php // The movie list will be rendered here ?> 
+    <div id="actor-movie-credits" class="mt-8"></div>
 </div>
 
 
-<div id="actor-movie-credits" class="mt-8"></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
