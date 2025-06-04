@@ -92,6 +92,15 @@ function import_movie_with_cast($movie_id)
 
     }
 
+    //trailer 
+    // url https://api.themoviedb.org/3/movie/movie_id/videos?language=en-US'
+    $trailer_url = "https://api.themoviedb.org/3/movie/{$movie['id']}/videos?language=en-US&api_key={$api_key}";
+    $trailer_response = wp_remote_get($trailer_url);
+    $trailer_data = json_decode(wp_remote_retrieve_body($trailer_response), true);
+    echo '<pre>';
+    print_r($trailer_data);
+    die();
+
 
     // Production Companies
     $production_companies = [];
@@ -170,16 +179,7 @@ function import_movie_with_cast($movie_id)
         // Save the cast images as a custom field on the actors post type
         update_field('images_file_path', $images_file_path, $actor_post_id); // Text
 
-        // Trailer
-        // Url api -> https://api.themoviedb.org/3/movie/movie_id/videos?language=en-US'
-        $trailer_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/videos?api_key={$api_key}&language=en-US");
-        $trailer_data = json_decode(wp_remote_retrieve_body($trailer_response), true);
-
-        echo '<pre>';
-        var_dump($trailer_data);
-        die();
-        
-
+     
 
       }
 
