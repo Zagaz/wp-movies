@@ -1,73 +1,18 @@
-WP Movies – WordPress Theme with Custom Post Types + ACF + TMDB API
-Welcome to WP Movies, a WordPress theme that demonstrates the use of custom post types (CPTs), Advanced Custom Fields (ACF), and integration with the external TMDB (The Movie Database) API.
+Step 1 – Install WordPress
+Step 2 – Install and activate the theme
+Use the provided a.zip file to install the theme.
 
-This project is preconfigured to run in a local DDEV environment and includes a sample database to make testing easy.
+Step 3 – Install the ACF (Advanced Custom Fields) plugin
+Make sure the ACF plugin is installed and activated.
 
-Repository: https://github.com/Zagaz/wp-movies.git
+Step 4 – Import the database content
+Go to: Tools → Import → WordPress
+(If prompted, click Install Now, then Run Importer)
 
-REQUIREMENTS
+Choose the file moviesdb.xml (located in the theme root folder)
 
-Docker
-DDEV
-Git
-QUICK START
+(Optional) Create an admin user during the import process
 
-1. Clone the repository:
+Click Submit and wait for the site to be populated (this may take a few minutes)
 
-git clone https://github.com/Zagaz/wp-movies.git cd wp-movies
-
-2. Start the DDEV environment:
-
-ddev start
-
-3. Import the database:
-
-ddev import-db --src=wp-content/themes/wp-movies/wp-movies.sql
-
-4. Install ACF plugin:
-
-5. Access the local site:
-
-Frontend: http://wp-movies.ddev.site Admin: http://wp-movies.ddev.site/wp-admin
-
-Login: Username: admin Password: admin
-
-6. Activate the theme:
-
-Go to Appearance > Themes and activate "WP Movies"
-
-WHAT’S INCLUDED
-
-Custom Post Types:
-
-Install ACF plugin
-
-Movie (movie)
-Actor (actor)
-ACF Field Groups:
-
-Movies
-Actors
-The fields are already included in the .sql database file and can be edited via the ACF plugin in the dashboard.
-
-TMDB API INTEGRATION
-
-This theme uses the TMDB API to pull movie and actor data dynamically.
-
-DIRECTORY STRUCTURE
-
-wp-content/ themes/ wp-movies/ functions.php - CPT registration and setup wp-movies.sql - Pre-configured database page-movies.php - Page template using the TMDB API template-parts/ - Optional reusable components
-
-DDEV COMMANDS
-
-Start environment: ddev start
-
-Stop environment: ddev stop
-
-Import DB: ddev import-db --src=wp-content/themes/wp-movies/wp-movies.sql
-
-Export DB: ddev export-db --file=yourfilename.sql
-
-Launch browser: ddev launch
-
-Launch phpMyAdmin: ddev launch -p phpmyadmin
+Step 5 – Enjoy!

@@ -1,121 +1,26 @@
-# WP Movies – WordPress Theme with Custom Post Types + ACF + TMDB API
+# Theme Installation Guide
 
-Welcome to WP Movies, a WordPress theme that demonstrates the use of custom post types (CPTs), Advanced Custom Fields (ACF), and integration with the external TMDB (The Movie Database) API.
+## Step 1 – Install WordPress
 
-This project is preconfigured to run in a local DDEV environment and includes a sample database to make testing easy.
+## Step 2 – Install and Activate the Theme
+- Use the provided `a.zip` file to install and activate the theme.
 
-Repository:
-[https://github.com/Zagaz/wp-movies.git](https://github.com/Zagaz/wp-movies.git)
+## Step 3 – Install the ACF (Advanced Custom Fields) Plugin
+- Make sure the ACF plugin is installed and activated.
 
----
+## Step 4 – Import the Database Content
+1. Go to **Tools → Import → WordPress**  
+   (If prompted, click **Install Now**, then **Run Importer**)
+2. Choose the file `moviesdb.xml` (located in the theme root folder).
+3. (Optional) Create an admin user during the import process.
+4. Click **Submit** and wait while the site is populated.  
+   _Note: This may take a few minutes._
 
-REQUIREMENTS
-
-* Docker
-* DDEV
-* Git
-
----
-
-QUICK START
-
-**1. Clone the repository:**
-
-   git clone [https://github.com/Zagaz/wp-movies.git](https://github.com/Zagaz/wp-movies.git)
-   cd wp-movies
-
-**2. Start the DDEV environment:**
-
-   ddev start
-
-**3 Install ACF plugin:**
-
-**4. Import the database:**
-
-   ddev import-db --src=wp-content/themes/wp-movies/wp-movies.sql
-
-**5. Access the local site:**
-
-   Frontend: [http://wp-movies.ddev.site](http://wp-movies.ddev.site)
-   Admin:    [http://wp-movies.ddev.site/wp-admin](http://wp-movies.ddev.site/wp-admin)
-
-   Login:
-   Username: admin
-   Password: admin
-
-**6. Activate the theme:**
-
-   Go to Appearance > Themes and activate "WP Movies"
+## Step 5 – Enjoy!
 
 ---
 
-WHAT’S INCLUDED
+### ⚠️ Important Note
 
-Custom Post Types:
-
-Install ACF plugin
-
-* Movie (`movie`)
-* Actor (`actor`)
-
-ACF Field Groups:
-
-* Movies
-* Actors
-
-The fields are already included in the `.sql` database file and can be edited via the ACF plugin in the dashboard.
-
----
-
-**TMDB API INTEGRATION**
-
-This theme uses the TMDB API to pull movie and actor data dynamically.
-
-
----
-
-DIRECTORY STRUCTURE
-
-wp-content/
-themes/
-wp-movies/
-functions.php          - CPT registration and setup
-wp-movies.sql          - Pre-configured database
-page-movies.php        - Page template using the TMDB API
-template-parts/        - Optional reusable components
-
-
----
-
-DDEV COMMANDS
-
-Start environment:
-ddev start
-
-Stop environment:
-ddev stop
-
-Import DB:
-ddev import-db --src=wp-content/themes/wp-movies/wp-movies.sql
-
-Export DB:
-ddev export-db --file=yourfilename.sql
-
-Launch browser:
-ddev launch
-
-Launch phpMyAdmin:
-ddev launch -p phpmyadmin
-
----
-
-SUPPORT
-
-If you have any issues or suggestions, feel free to open an issue or contact [https://github.com/Zagaz](https://github.com/Zagaz).
-
----
-
-LICENSE
-
-This project is released under the MIT License.
-
+On the movie details page, reviews are meant to be displayed.  
+However, since the listed movies are upcoming releases, no reviews are currently available.
