@@ -80,7 +80,7 @@ if (have_posts()) :
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="text-gray-600">Images not found</p>
+                <p class="text-gray-600">No image found</p>
             <?php endif; ?>
         </div>
     </div>
