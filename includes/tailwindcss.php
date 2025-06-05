@@ -10,9 +10,9 @@
 function wp_movies_enqueue_scripts() {
     wp_enqueue_style(
         'wp-movies-style',
-        get_template_directory_uri() . '/dist/style.css',
+        get_template_directory_uri() . '/style/movies-tailwindcss.css',
         [],
-        filemtime(get_template_directory() . '/dist/output.css') // force reload on update
+        filemtime(get_template_directory() . '/style/movies-tailwindcss.css') // force reload on update
     );
 }
 add_action('wp_enqueue_scripts', 'wp_movies_enqueue_scripts');
