@@ -80,7 +80,7 @@ if (have_posts()) :
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="text-gray-600">No images available.</p>
+                <p class="text-gray-600">Images not found</p>
             <?php endif; ?>
         </div>
     </div>
@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }// End display movies
 
     // Simple HTML escape to prevent XSS
+    // do not display on the frontend
     function escapeHtml(text) {
         if (!text) return '';
         return text.replace(/[&<>"']/g, function (m) {

@@ -31,32 +31,42 @@ function import_movie_with_cast($movie_id)
   foreach ($movies as $movie) {
     // Defensive: skip if no title or overview
     if (empty($movie['title']) || empty($movie['overview'])) {
-      continue;
+        continue;
     }
 
     // Check if this movie already exists by tmdb_id
     $existing = new WP_Query([
-      'post_type'  => 'movie',
-      'meta_query' => [
-        [
-          'key'   => 'tmdb_id',
-          'value' => $movie['id'],
-        ]
-      ],
-      'posts_per_page' => 1,
-      'fields' => 'ids',
+        'post_type'  => 'movie',
+        'meta_query' => [
+            [
+                'key'   => 'tmdb_id',
+                'value' => $movie['id'],
+            ]
+        ],
+        'posts_per_page' => 1,
+        'fields' => 'ids',
     ]);
     if (!empty($existing->posts)) {
-      continue; // Skip if already exists
+        continue; // Skip if already exists
+    }
+
+    // Check for movie by title as a fallback (extra safety)
+    $existing_by_title = new WP_Query([
+        'post_type'      => 'movie',
+        'title'          => $movie['title'],
+        'posts_per_page' => 1,
+        'fields'         => 'ids',
+    ]);
+    if (!empty($existing_by_title->posts)) {
+        continue; // Skip if a movie with the same title exists
     }
 
     // Create the movie post
     $movie_post_id = wp_insert_post([
-
-      'post_title'   => $movie['title'],
-      'post_content' => $movie['overview'],
-      'post_type'    => 'movie',
-      'post_status'  => 'publish',
+        'post_title'   => $movie['title'],
+        'post_content' => $movie['overview'],
+        'post_type'    => 'movie',
+        'post_status'  => 'publish',
     ]);
 
     if (is_wp_error($movie_post_id)) continue;
@@ -190,69 +200,75 @@ function import_movie_with_cast($movie_id)
     $actors_response['body'] = json_decode($actors_response['body'], true);
     $actors_data =   $actors_response['body'];
     $cast_names = [];
+    $cast_ids = [];
     if (!empty($actors_data['cast'])) {
-      // Collect all actor IDs that don't exist yet to fetch their details in batch
+        $new_actors = [];
+        foreach ($actors_data['cast'] as $actor) {
+            // Check if actor already exists by tmdb_actor_id
+            $existing_actor = new WP_Query([
+                'post_type'      => 'actor',
+                'meta_query'     => [
+                    [
+                        'key'   => 'tmdb_actor_id',
+                        'value' => $actor['id'],
+                    ]
+                ],
+                'posts_per_page' => 1,
+                'fields'         => 'ids',
+            ]);
 
-      $new_actors = [];
-      foreach ($actors_data['cast'] as $actor) {
-        // Check if actor already exists by tmdb_actor_id
-        $existing_actor = new WP_Query([
-          'post_type'      => 'actor',
-          'meta_query'     => [
-            [
-              'key'   => 'tmdb_actor_id',
-              'value' => $actor['id'],
-            ]
-          ],
-          'posts_per_page' => 1,
-          'fields'         => 'ids',
-        ]);
+            // Also check for actor by name (avoid duplicate names)
+            $existing_actor_by_name = new WP_Query([
+                'post_type'      => 'actor',
+                'title'          => $actor['name'],
+                'posts_per_page' => 1,
+                'fields'         => 'ids',
+            ]);
+            if (!empty($existing_actor->posts)) {
+                $actor_post_id = $existing_actor->posts[0];
+            } elseif (!empty($existing_actor_by_name->posts)) {
+                $actor_post_id = $existing_actor_by_name->posts[0];
+            } else {
+                // Create the actor post first
+                $actor_post_id = wp_insert_post([
+                    'post_title'   => $actor['name'],
+                    'post_type'    => 'actor',
+                    'post_status'  => 'publish',
+                ]);
+                update_field('tmdb_actor_id', $actor['id'], $actor_post_id);
 
-        if (!empty($existing_actor->posts)) {
-          $actor_post_id = $existing_actor->posts[0];
-        } else {
-          // Create the actor post first
-          $actor_post_id = wp_insert_post([
-            'post_title'   => $actor['name'],
-            'post_type'    => 'actor',
-            'post_status'  => 'publish',
-          ]);
-          update_field('tmdb_actor_id', $actor['id'], $actor_post_id); // Text
-
-          // Queue for details fetch
-          $new_actors[] = [
-            'id' => $actor['id'],
-            'post_id' => $actor_post_id,
-            'profile_path' => $actor['profile_path'] ?? '',
-            'popularity' => $actor['popularity'] ?? '',
-           
-          ];
-        }
-
-        if (is_wp_error($actor_post_id)) continue;
-
-        // Save the actor's (cast) name and id list on the movie post in the same array 
-        $cast_names[] = $actor['name'];
-        $cast_ids[] = $actor_post_id;
-
-        // Actors Images
-        $url_images = "https://api.themoviedb.org/3/person/{$actor['id']}/images?api_key={$api_key}";
-        $images_response = wp_remote_get($url_images);
-        $images_data = json_decode(wp_remote_retrieve_body($images_response), true);
-        $images = $images_data['profiles'] ?? [];
-
-        $images_file_path = [];
-        if (!empty($images)) {
-          foreach ($images as $image) {
-
-            // Check if the image URL is valid
-            if (!empty($image['file_path'])) {
-              $images_file_path[] = $image['file_path'];
+                // Queue for details fetch
+                $new_actors[] = [
+                    'id' => $actor['id'],
+                    'post_id' => $actor_post_id,
+                    'profile_path' => $actor['profile_path'] ?? '',
+                    'popularity' => $actor['popularity'] ?? '',
+                ];
             }
-          }
-        }
-        // Save the cast images as a custom field on the actors post type
-        update_field('images_file_path', $images_file_path, $actor_post_id); // Text
+
+            if (is_wp_error($actor_post_id)) continue;
+
+            $cast_names[] = $actor['name'];
+            $cast_ids[] = $actor_post_id;
+
+            // Actors Images
+            $url_images = "https://api.themoviedb.org/3/person/{$actor['id']}/images?api_key={$api_key}";
+            $images_response = wp_remote_get($url_images);
+            $images_data = json_decode(wp_remote_retrieve_body($images_response), true);
+            $images = $images_data['profiles'] ?? [];
+
+            $images_file_path = [];
+            if (!empty($images)) {
+                foreach ($images as $image) {
+
+                    // Check if the image URL is valid
+                    if (!empty($image['file_path'])) {
+                        $images_file_path[] = $image['file_path'];
+                    }
+                }
+            }
+            // Save the cast images as a custom field on the actors post type
+            update_field('images_file_path', $images_file_path, $actor_post_id); // Text
 
      
 

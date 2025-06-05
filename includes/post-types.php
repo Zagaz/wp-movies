@@ -28,6 +28,7 @@ function register_actor_post_type() {
          'has_archive' => true,
           'menu_icon' => 'dashicons-universal-access-alt',
         'supports' => array('title', 'editor', 'thumbnail'),
+        'rewrite' => ['slug' => 'actors'],
         'show_in_rest' => true,
     ));
 }
