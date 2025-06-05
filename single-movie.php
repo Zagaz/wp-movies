@@ -1,6 +1,6 @@
 <?php
 get_header(); // Load header
-  $api_key = '9facf375ac53c66a77dfa59841360240';
+  $api_key = TMDB_API_KEY;
 
 if (have_posts()) :
     while (have_posts()) : the_post();

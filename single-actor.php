@@ -8,7 +8,7 @@
 
 get_header();
 
-$api_key = '9facf375ac53c66a77dfa59841360240';
+$api_key = TMDB_API_KEY;
 
 if (have_posts()) :
     while (have_posts()) : the_post();
@@ -95,7 +95,7 @@ if (have_posts()) :
 document.addEventListener('DOMContentLoaded', function () {
     // Pass PHP variables to JS
     const tmdbActorId = <?php echo json_encode($tmdb_actor_id); ?>;
-    const apiKey = <?php echo json_encode($api_key); ?>;
+    const apiKey = <?php echo json_encode(TMDB_API_KEY); ?>;
     const imagePlaceholder = <?php echo json_encode(esc_url($image_placeholder)); ?>;
 
     fetchAndDisplayMovieCredits(tmdbActorId);

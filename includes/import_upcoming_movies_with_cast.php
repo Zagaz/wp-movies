@@ -2,7 +2,7 @@
 // Function that fetches upcoming movies and calls the import function
 function import_upcoming_movies_with_cast()
 {
-  $api_key = '9facf375ac53c66a77dfa59841360240';
+  $api_key = TMDB_API_KEY;
 
   $response = wp_remote_get("https://api.themoviedb.org/3/movie/upcoming?api_key={$api_key}&language=en-US&page=1");
   $data = json_decode(wp_remote_retrieve_body($response), true);

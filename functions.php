@@ -7,13 +7,14 @@ foreach ($includes as $file) {
   require_once $file;
 }
 
-
+if ( ! defined( 'TMDB_API_KEY' ) ) {
+    define( 'TMDB_API_KEY', '9facf375ac53c66a77dfa59841360240' );
+}
 
 // Function that imports a movie and its actors
 function import_movie_with_cast($movie_id)
 {
-  //todo
-  $api_key = '9facf375ac53c66a77dfa59841360240';
+  $api_key = TMDB_API_KEY;
 
 
   $url = "https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US";
