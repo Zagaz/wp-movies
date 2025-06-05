@@ -20,8 +20,6 @@ add_action('wp_enqueue_scripts', function() {
             [],
             $mtime
         );
-    } else {
-        // Optionally handle the missing file (e.g., log, fallback, or skip)
     }
 });
 
