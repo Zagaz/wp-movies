@@ -50,7 +50,7 @@ get_header();
 
     $actors = new WP_Query($args);
     $image_url = 'https://image.tmdb.org/t/p/w500';
-    $image_placeholder = get_site_url() . '/wp-content/uploads/2025/06/red_carpet-1.jpg';
+    $image_placeholder = get_template_directory_uri() . '/assets/red_carpet.jpg';
     ?>
 
     <?php if ($actors->have_posts()) : ?>
