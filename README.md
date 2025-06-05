@@ -28,7 +28,7 @@ QUICK START
 
    ddev start
 
-**3 Imstall ACF plugin:**
+**3 Install ACF plugin:**
 
 **4. Import the database:**
 
