@@ -24,13 +24,15 @@ ddev start
 
 ddev import-db --src=wp-content/themes/wp-movies/wp-movies.sql
 
-4. Access the local site:
+4. Install ACF plugin:
+
+5. Access the local site:
 
 Frontend: http://wp-movies.ddev.site Admin: http://wp-movies.ddev.site/wp-admin
 
 Login: Username: admin Password: admin
 
-5. Activate the theme:
+6. Activate the theme:
 
 Go to Appearance > Themes and activate "WP Movies"
 
