@@ -9,11 +9,11 @@ get_header();
     <form method="get" class="mb-8 flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
             <label class="block text-gray-700 mb-1" for="filter-name">Name</label>
-            <input type="text" id="filter-name" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by actor name..." class="border rounded px-3 py-2 w-full">
+            <input type="text" id="filter-name" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by actor name..." class="border rounded px-3 py-2 w-full placeholder-gray-500 text-gray-900">
         </div>
         <div class="flex-1">
             <label class="block text-gray-700 mb-1" for="filter-movie">Movie</label>
-            <input type="text" id="filter-movie" name="movie" value="<?php echo esc_attr(get_query_var('movie')); ?>" placeholder="Search by movie title..." class="border rounded px-3 py-2 w-full">
+            <input type="text" id="filter-movie" name="movie" value="<?php echo esc_attr(get_query_var('movie')); ?>" placeholder="Search by movie title..." class="border rounded px-3 py-2 w-full placeholder-gray-500 text-gray-900">
         </div>
         <div class="flex flex-col gap-2">
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Filter</button>
