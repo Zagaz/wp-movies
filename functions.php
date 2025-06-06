@@ -6,319 +6,297 @@ $includes = glob(__DIR__ . '/includes/*.php');
 foreach ($includes as $file) {
   require_once $file;
 }
-
+/**
+ * Define TMDB_API_KEY in wp-config.php for security and easier management.
+ * Example: define('TMDB_API_KEY', 'your_actual_api_key_here');
+ */
 if ( ! defined( 'TMDB_API_KEY' ) ) {
     define( 'TMDB_API_KEY', '9facf375ac53c66a77dfa59841360240' );
 }
 
-// Function that imports a movie and its actors
-function import_movie_with_cast($movie_id)
-{
-  $api_key = TMDB_API_KEY;
+/**
+ * Imports upcoming movies and their cast/crew details from TMDB.
+ * Fetches a list of upcoming movies and then processes each one.
+ */
+function import_upcoming_movies_and_cast() {
+    $api_key = TMDB_API_KEY;
 
+    // 1. Fetch list of upcoming movie IDs (or basic data)
+    $discover_url = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=" . date('Y-m-d') . "&language=en-US&sort_by=popularity.desc&api_key={$api_key}";
+    $discover_response = wp_remote_get($discover_url);
 
-  $url = "https://api.themoviedb.org/3/movie/{$movie_id}?api_key={$api_key}&language=en-US";
-  $url2 = "https://api.themoviedb.org/3/discover/movie?&primary_release_date.gte=2025-06-03&language=en-US&api_key={$api_key} ";
-  $movie_response = wp_remote_get($url2);
-  $movie_data = json_decode(wp_remote_retrieve_body($movie_response), true);
-  $movies_res = $movie_data['results'] ?? [];
+    if (is_wp_error($discover_response) || wp_remote_retrieve_response_code($discover_response) !== 200) {
+        error_log('TMDB Import: Failed to fetch upcoming movies. Response: ' . (is_wp_error($discover_response) ? $discover_response->get_error_message() : wp_remote_retrieve_response_code($discover_response) . ' - ' . wp_remote_retrieve_response_message($discover_response)));
+        return;
+    }
+    $discover_data = json_decode(wp_remote_retrieve_body($discover_response), true);
+    $upcoming_movies_partial = $discover_data['results'] ?? [];
 
-
-  // just keep the first 10 movies
-  //$movies = array_slice($movies_res, 0, 10);
-  $movies = $movies_res;
-
-
-
-  foreach ($movies as $movie) {
-    // Defensive: skip if no title or overview
-    if (empty($movie['title']) || empty($movie['overview'])) {
-        continue;
+    if (empty($upcoming_movies_partial)) {
+        error_log('TMDB Import: No upcoming movies found to import.');
+        return;
     }
 
-    // Check if this movie already exists by tmdb_id
-    $existing = new WP_Query([
-        'post_type'  => 'movie',
-        'meta_query' => [
-            [
-                'key'   => 'tmdb_id',
-                'value' => $movie['id'],
-            ]
-        ],
-        'posts_per_page' => 1,
-        'fields' => 'ids',
-    ]);
-    if (!empty($existing->posts)) {
-        continue; // Skip if already exists
-    }
+    // Limit the number of movies to import, e.g., top 10
+    // $upcoming_movies_partial = array_slice($upcoming_movies_partial, 0, 10);
 
-    // Check for movie by title as a fallback (extra safety)
-    $existing_by_title = new WP_Query([
-        'post_type'      => 'movie',
-        'title'          => $movie['title'],
-        'posts_per_page' => 1,
-        'fields'         => 'ids',
-    ]);
-    if (!empty($existing_by_title->posts)) {
-        continue; // Skip if a movie with the same title exists
-    }
+    foreach ($upcoming_movies_partial as $partial_movie_data) {
+        $tmdb_movie_id = $partial_movie_data['id'];
 
-    // Create the movie post
-    $movie_post_id = wp_insert_post([
-        'post_title'   => $movie['title'],
-        'post_content' => $movie['overview'],
-        'post_type'    => 'movie',
-        'post_status'  => 'publish',
-    ]);
-
-    if (is_wp_error($movie_post_id)) continue;
-  
-
- 
-    // Save the movie's TMDB ID and other details
-    update_field('tmdb_id', $movie['id'] ?? 'n/a', $movie_post_id);
-    update_field('release_date', $movie['release_date'] ?? 'n/a', $movie_post_id);
-    update_field('poster_url', $movie['poster_path'] ?? 'n/a', $movie_post_id);
-    update_field('production_companies', $movie['production_companies'] ?? 'n/a', $movie_post_id);
-    update_field('original_language', $movie['original_language'] ?? 'n/a', $movie_post_id);
-    update_field('movie_popularity', $movie['popularity'] ?? 'n/a', $movie_post_id);
-
-
-
-
-    // Production Companies
-    //https://api.themoviedb.org/3/movie/movie_id?language=en-US
-    $production_companies_res = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}?language=en-US&api_key={$api_key}");
-    $production_companies_data = json_decode(wp_remote_retrieve_body($production_companies_res), true);
-    $production_companies_list = $production_companies_data['production_companies'] ?? [];
-
-    // loop through the production companies and save them as a custom field
-    $production_companies_names = [];
-    foreach ($production_companies_list as $company) {
-      $production_companies_names[] = $company['name'] ?? '';
-    }
-    // Convert the array to a comma-separated string
-    $production_companies_string = implode(', ', $production_companies_names);
-    // Save the production companies as a custom field on the movie post
-    if (!empty($production_companies_string)) {
-      update_field('production_companies', $production_companies_string, $movie_post_id); // Text
-    } else {
-      update_field('production_companies', 'Not available', $movie_post_id); // Text
-    }
- 
-
-
-// GENRES
-
-    $genres_ids = $movie['genre_ids'] ?? [];
-
-    // Use this id's to fetch the name of the genre and compare to $genres_ids
-    $genre_url = "https://api.themoviedb.org/3/genre/movie/list?language=en-US&api_key={$api_key}";
-    $genre_response = wp_remote_get($genre_url);
-    $genre_data = json_decode(wp_remote_retrieve_body($genre_response), true);
-    $genres = [];
-    if (!empty($genre_data['genres'])) {
-      foreach ($genre_data['genres'] as $genre) {
-        if (in_array($genre['id'], $genres_ids)) {
-          $genres[] = $genre['name'];
+        // 2. Check if movie already exists by tmdb_id
+        $existing_movie_query = new WP_Query([
+            'post_type'  => 'movie',
+            'meta_key'   => 'tmdb_id',
+            'meta_value' => $tmdb_movie_id,
+            'posts_per_page' => 1,
+            'fields' => 'ids',
+        ]);
+        if (!empty($existing_movie_query->posts)) {
+            // error_log("TMDB Import: Movie with TMDB ID {$tmdb_movie_id} already exists. Skipping.");
+            continue;
         }
-      }
-    }
-    // Convert genres array to a comma-separated string
-    $genres = implode(', ', $genres);
-    // Save the genres as a custom field on the movie post
-    if (!empty($genres)) {
-      update_field('genres', $genres, $movie_post_id); // Text
-    } else {
-      update_field('genres', 'Not available', $movie_post_id); // Text
 
-    }
+        // 3. Fetch full movie details including credits, videos, similar, alternative_titles
+        $movie_detail_url = "https://api.themoviedb.org/3/movie/{$tmdb_movie_id}?api_key={$api_key}&language=en-US&append_to_response=credits,videos,similar,alternative_titles";
+        $movie_detail_response = wp_remote_get($movie_detail_url);
 
-   
-
-
-
-    //trailer 
-    // url https://api.themoviedb.org/3/movie/movie_id/videos?language=en-US'
-    $trailer_url = "https://api.themoviedb.org/3/movie/{$movie['id']}/videos?language=en-US&api_key={$api_key}";
-    $trailer_response = wp_remote_get($trailer_url);
-    $trailer_data = json_decode(wp_remote_retrieve_body($trailer_response), true);
-    $trailer_key = '';
-    if (!empty($trailer_data['results'])) {
-      foreach ($trailer_data['results'] as $video) {
-        if ($video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
-          $trailer_key = $video['key'];
-          break; // Stop after finding the first trailer
+        if (is_wp_error($movie_detail_response) || wp_remote_retrieve_response_code($movie_detail_response) !== 200) {
+            error_log("TMDB Import: Failed to fetch details for movie TMDB ID {$tmdb_movie_id}. Skipping.");
+            continue;
         }
-      }
-    }
+        $movie_data = json_decode(wp_remote_retrieve_body($movie_detail_response), true);
 
-    $trailer_status ='';
-    // Save the trailer key as a custom field on the movie post
-    if (!empty($trailer_key)) {
-      $trailer_status=$trailer_key;
-    } else {
-      $trailer_status = 'Not available';
-    }
-    
-   update_field('trailer', $trailer_status, $movie_post_id);
+        if (empty($movie_data['title']) || empty($movie_data['overview'])) {
+            error_log("TMDB Import: Movie TMDB ID {$tmdb_movie_id} ('{$movie_data['title']}') has no title or overview. Skipping.");
+            continue;
+        }
+        
+        // Fallback: Check by title (less reliable)
+        $existing_by_title = new WP_Query([
+            'post_type'      => 'movie',
+            'title'          => $movie_data['title'],
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
+        ]);
+        if (!empty($existing_by_title->posts)) {
+            // error_log("TMDB Import: Movie with title '{$movie_data['title']}' already exists (fallback check). Skipping TMDB ID {$tmdb_movie_id}.");
+            continue; 
+        }
 
-   // SIMILAR MOVIES
+        // 4. Create Movie Post
+        $movie_post_id = wp_insert_post([
+            'post_title'   => sanitize_text_field($movie_data['title']),
+            'post_content' => wp_kses_post($movie_data['overview']),
+            'post_type'    => 'movie',
+            'post_status'  => 'publish',
+        ]);
 
-   $url_similar_movies = "https://api.themoviedb.org/3/movie/{$movie['id']}/similar?api_key={$api_key}&language=en-US&page=1";
-   $similar_res = wp_remote_get($url_similar_movies);
-   $similar_data = json_decode(wp_remote_retrieve_body($similar_res), true);
-   // loop $similar_data
-   $similar_movies = [];
-   foreach ($similar_data['results'] as $similar_movie) {
-     $similar_movie_title = $similar_movie['title'] ?? '';
-     $similar_movies[] = $similar_movie_title;
-   }
-   $similar_movies_string = implode(', ', $similar_movies);
-   update_field('similar_movies', $similar_movies_string, $movie_post_id);
-   
-   // Alternative Titles
-   //http GET https://api.themoviedb.org/3/movie/movie_id/alternative_titles
-   $url_alternative_titles_res ="https://api.themoviedb.org/3/movie/{$movie['id']}/alternative_titles?api_key={$api_key}&language=en-US";
-   $alternative_titles_response = wp_remote_get($url_alternative_titles_res);
-   $alternative_titles_data = json_decode(wp_remote_retrieve_body($alternative_titles_response), true);
-   $alternative_titles = [];
-   if (!empty($alternative_titles_data['titles'])) {
-     foreach ($alternative_titles_data['titles'] as $title) {
-       $alternative_titles[] = $title['title'] ?? '';
-     }
-   }
-   // Convert the array to a comma-separated string
-   $alternative_titles_string = implode(', ', $alternative_titles);
-   // Save the alternative titles as a custom field on the movie post
-   if (!empty($alternative_titles_string)) {
-     update_field('alternative_titles', $alternative_titles_string, $movie_post_id); // Text
-   } else {
-     update_field('alternative_titles', 'Not available', $movie_post_id); // Text
-   }
+        if (is_wp_error($movie_post_id)) {
+            error_log("TMDB Import: Failed to insert movie '{$movie_data['title']}': " . $movie_post_id->get_error_message());
+            continue;
+        }
 
-    // Actors
-    $actors_response = wp_remote_get("https://api.themoviedb.org/3/movie/{$movie['id']}/credits?api_key={$api_key}&language=en-US");
-    $actors_response['body'] = json_decode($actors_response['body'], true);
-    $actors_data =   $actors_response['body'];
-    $cast_names = [];
-    $cast_ids = [];
-    if (!empty($actors_data['cast'])) {
-        $new_actors = [];
-        foreach ($actors_data['cast'] as $actor) {
-            // Check if actor already exists by tmdb_actor_id
-            $existing_actor = new WP_Query([
-                'post_type'      => 'actor',
-                'meta_query'     => [
-                    [
-                        'key'   => 'tmdb_actor_id',
-                        'value' => $actor['id'],
-                    ]
-                ],
-                'posts_per_page' => 1,
-                'fields'         => 'ids',
+        // 5. Update Movie ACF Fields
+        update_field('tmdb_id', $movie_data['id'], $movie_post_id);
+        update_field('release_date', $movie_data['release_date'] ?? '', $movie_post_id);
+        update_field('poster_url', $movie_data['poster_path'] ?? '', $movie_post_id);
+        update_field('original_language', $movie_data['original_language'] ?? '', $movie_post_id);
+        update_field('movie_popularity', $movie_data['popularity'] ?? '', $movie_post_id);
+
+        // Production Companies
+        $production_companies_names = [];
+        if (!empty($movie_data['production_companies'])) {
+            foreach ($movie_data['production_companies'] as $company) {
+                $production_companies_names[] = sanitize_text_field($company['name']);
+            }
+        }
+        update_field('production_companies', !empty($production_companies_names) ? implode(', ', $production_companies_names) : '', $movie_post_id);
+
+        // Genres
+        $genre_names = [];
+        if (!empty($movie_data['genres'])) {
+            foreach ($movie_data['genres'] as $genre) {
+                $genre_names[] = sanitize_text_field($genre['name']);
+            }
+        }
+        update_field('genres', !empty($genre_names) ? implode(', ', $genre_names) : '', $movie_post_id);
+        
+        // Trailer
+        $trailer_key = '';
+        if (!empty($movie_data['videos']['results'])) {
+            foreach ($movie_data['videos']['results'] as $video) {
+                if (isset($video['type'], $video['site'], $video['key']) && strtolower($video['type']) === 'trailer' && strtolower($video['site']) === 'youtube') {
+                    $trailer_key = sanitize_text_field($video['key']);
+                    break;
+                }
+            }
+        }
+        update_field('trailer', $trailer_key ?: '', $movie_post_id);
+
+        // Similar Movies (titles) - limited to 5
+        $similar_movie_titles = [];
+        if (!empty($movie_data['similar']['results'])) {
+            foreach (array_slice($movie_data['similar']['results'], 0, 5) as $similar_movie) {
+                if (!empty($similar_movie['title'])) {
+                    $similar_movie_titles[] = sanitize_text_field($similar_movie['title']);
+                }
+            }
+        }
+        update_field('similar_movies', !empty($similar_movie_titles) ? implode(', ', $similar_movie_titles) : '', $movie_post_id);
+
+        // Alternative Titles - limited to 5 unique titles
+        $alt_titles = [];
+        if (!empty($movie_data['alternative_titles']['titles'])) {
+            foreach (array_slice($movie_data['alternative_titles']['titles'], 0, 10) as $alt_title) { // Check more to find unique ones
+                if (!empty($alt_title['title']) && count($alt_titles) < 5) {
+                    $alt_titles[] = sanitize_text_field($alt_title['title']);
+                }
+            }
+        }
+        update_field('alternative_titles', !empty($alt_titles) ? implode(', ', array_unique($alt_titles)) : '', $movie_post_id);
+
+        // 6. Process Cast
+        $cast_credits = $movie_data['credits']['cast'] ?? [];
+        $processed_cast_names = [];
+        $processed_cast_post_ids = [];
+
+        foreach (array_slice($cast_credits, 0, 15) as $actor_credit) { // Limit number of cast members processed
+            if (empty($actor_credit['id']) || empty($actor_credit['name'])) {
+                continue;
+            }
+
+            $actor_post_id = null;
+            // Check if actor exists by tmdb_actor_id
+            $existing_actor_by_tmdb_id_query = new WP_Query([
+                'post_type'  => 'actor', 'meta_key'   => 'tmdb_actor_id',
+                'meta_value' => $actor_credit['id'], 'posts_per_page' => 1, 'fields' => 'ids',
             ]);
-
-            // Also check for actor by name (avoid duplicate names)
-            $existing_actor_by_name = new WP_Query([
-                'post_type'      => 'actor',
-                'title'          => $actor['name'],
-                'posts_per_page' => 1,
-                'fields'         => 'ids',
-            ]);
-            if (!empty($existing_actor->posts)) {
-                $actor_post_id = $existing_actor->posts[0];
-            } elseif (!empty($existing_actor_by_name->posts)) {
-                $actor_post_id = $existing_actor_by_name->posts[0];
+            if (!empty($existing_actor_by_tmdb_id_query->posts)) {
+                $actor_post_id = $existing_actor_by_tmdb_id_query->posts[0];
             } else {
-                // Create the actor post first
+                // Check by name as a fallback
+                $existing_actor_by_name_query = new WP_Query([
+                    'post_type' => 'actor', 'title' => sanitize_text_field($actor_credit['name']),
+                    'posts_per_page' => 1, 'fields' => 'ids',
+                ]);
+                if (!empty($existing_actor_by_name_query->posts)) {
+                    $actor_post_id = $existing_actor_by_name_query->posts[0];
+                    // If found by name, update their TMDB ID if it's missing or different
+                    update_field('tmdb_actor_id', $actor_credit['id'], $actor_post_id);
+                }
+            }
+
+            if (!$actor_post_id) { // Actor does not exist, create them
                 $actor_post_id = wp_insert_post([
-                    'post_title'   => $actor['name'],
+                    'post_title'   => sanitize_text_field($actor_credit['name']),
                     'post_type'    => 'actor',
                     'post_status'  => 'publish',
                 ]);
-                update_field('tmdb_actor_id', $actor['id'], $actor_post_id);
+                if (is_wp_error($actor_post_id)) {
+                    error_log("TMDB Import: Failed to insert actor '{$actor_credit['name']}': " . $actor_post_id->get_error_message());
+                    continue;
+                }
+                update_field('tmdb_actor_id', $actor_credit['id'], $actor_post_id);
 
-                // Queue for details fetch
-                $new_actors[] = [
-                    'id' => $actor['id'],
-                    'post_id' => $actor_post_id,
-                    'profile_path' => $actor['profile_path'] ?? '',
-                    'popularity' => $actor['popularity'] ?? '',
-                ];
-            }
+                // Fetch full actor details + images
+                $actor_detail_url = "https://api.themoviedb.org/3/person/{$actor_credit['id']}?api_key={$api_key}&language=en-US&append_to_response=images";
+                $actor_detail_response = wp_remote_get($actor_detail_url);
+                if (!is_wp_error($actor_detail_response) && wp_remote_retrieve_response_code($actor_detail_response) === 200) {
+                    $actor_details_data = json_decode(wp_remote_retrieve_body($actor_detail_response), true);
+                    update_field('biography', !empty($actor_details_data['biography']) ? wp_kses_post($actor_details_data['biography']) : '', $actor_post_id);
+                    update_field('birthday', $actor_details_data['birthday'] ?? '', $actor_post_id);
+                    update_field('deathday', $actor_details_data['deathday'] ?? '', $actor_post_id);
+                    update_field('place_of_birth', !empty($actor_details_data['place_of_birth']) ? sanitize_text_field($actor_details_data['place_of_birth']) : '', $actor_post_id);
+                    update_field('known_for_department', !empty($actor_details_data['known_for_department']) ? sanitize_text_field($actor_details_data['known_for_department']) : '', $actor_post_id);
+                    update_field('profile_path', $actor_details_data['profile_path'] ?? ($actor_credit['profile_path'] ?? ''), $actor_post_id);
+                    update_field('popularity', $actor_details_data['popularity'] ?? ($actor_credit['popularity'] ?? ''), $actor_post_id);
+                    update_field('homepage', !empty($actor_details_data['homepage']) ? esc_url_raw($actor_details_data['homepage']) : '', $actor_post_id);
 
-            if (is_wp_error($actor_post_id)) continue;
-
-            $cast_names[] = $actor['name'];
-            $cast_ids[] = $actor_post_id;
-
-            // Actors Images
-            $url_images = "https://api.themoviedb.org/3/person/{$actor['id']}/images?api_key={$api_key}";
-            $images_response = wp_remote_get($url_images);
-            $images_data = json_decode(wp_remote_retrieve_body($images_response), true);
-            $images = $images_data['profiles'] ?? [];
-
-            $images_file_path = [];
-            if (!empty($images)) {
-                foreach ($images as $image) {
-
-                    // Check if the image URL is valid
-                    if (!empty($image['file_path'])) {
-                        $images_file_path[] = $image['file_path'];
+                    $actor_image_paths = [];
+                    if (!empty($actor_details_data['images']['profiles'])) {
+                        foreach (array_slice($actor_details_data['images']['profiles'], 0, 10) as $image_profile) { // Limit images
+                            if (!empty($image_profile['file_path'])) {
+                                $actor_image_paths[] = $image_profile['file_path'];
+                            }
+                        }
                     }
+                    update_field('images_file_path', $actor_image_paths, $actor_post_id);
+                } else {
+                     // Fallback: update with basic info from credits if full fetch fails
+                    update_field('profile_path', $actor_credit['profile_path'] ?? '', $actor_post_id);
+                    update_field('popularity', $actor_credit['popularity'] ?? '', $actor_post_id);
+                    error_log("TMDB Import: Failed to fetch full details for actor TMDB ID {$actor_credit['id']}. Basic info from credits saved.");
                 }
             }
-            // Save the cast images as a custom field on the actors post type
-            update_field('images_file_path', $images_file_path, $actor_post_id); // Text
-
-     
-
-      }
-
-      // Fetch details for all new actors (sequentially, as TMDB API does not support batch)
-      foreach ($new_actors as $new_actor) {
-        $actor_details_response = wp_remote_get("https://api.themoviedb.org/3/person/{$new_actor['id']}?api_key={$api_key}&language=en-US");
-        if (is_wp_error($actor_details_response)) {
-          continue;
+            $processed_cast_names[] = sanitize_text_field($actor_credit['name']);
+            $processed_cast_post_ids[] = $actor_post_id;
         }
-        $actor_details_data = json_decode(wp_remote_retrieve_body($actor_details_response), true);
+        // Update movie with cast info
+        // Assumes 'cast' ACF field on movie stores an array of names (for single-movie.php)
+        // Assumes 'cast_post_ids' ACF field on movie stores an array of actor post IDs (e.g., for relationship)
+        update_field('cast', $processed_cast_names, $movie_post_id); 
+        update_field('cast_post_ids', $processed_cast_post_ids, $movie_post_id);
 
-        // Save additional actor details, using null coalescing to avoid warnings
-        update_field('biography', $actor_details_data['biography'] ?? '', $new_actor['post_id']); // Text Area
-        update_field('birthday', $actor_details_data['birthday'] ?? '', $new_actor['post_id']); // Date Picker
-        update_field('deathday', $actor_details_data['deathday'] ?? '', $new_actor['post_id']); // Date Picker
-        update_field('place_of_birth', $actor_details_data['place_of_birth'] ?? '', $new_actor['post_id']); // Text
-        update_field('known_for_department', $actor_details_data['known_for_department'] ?? '', $new_actor['post_id']); // Text
-        update_field('profile_path', $new_actor['profile_path'], $new_actor['post_id']); // Text
-        update_field('popularity', $new_actor['popularity'], $new_actor['post_id']); // Text
-        update_field('homepage', $actor_details_data['homepage'] ?? '', $new_actor['post_id']); // Text
-      }
-    }
-    // CREW
-    $crew_names = [];
-    if (!empty($actors_data['crew'])) {
-      foreach ($actors_data['crew'] as $crew_member) {
-        $crew_names[] = $crew_member['name'] ?? ''; // Collect unique crew names
-        // Create or update the crew post
-        $crew_post_id = wp_insert_post([
-          'post_title'   => $crew_member['name'],
-          'post_type'    => 'actor',
-          'post_status'  => 'publish',
-        ]);
+        // 7. Process Key Crew Members
+        $crew_credits = $movie_data['credits']['crew'] ?? [];
+        $key_crew_roles = ['Director', 'Writer', 'Screenplay', 'Producer', 'Director of Photography', 'Original Music Composer'];
+        $movie_crew_display_list = [];
+        $unique_crew_added = []; // To avoid duplicates like "Name (Director), Name (Producer)"
 
-        if (is_wp_error($crew_post_id)) continue;
+        foreach ($crew_credits as $crew_member_data) {
+            if (empty($crew_member_data['name']) || empty($crew_member_data['job'])) {
+                continue;
+            }
+            if (in_array($crew_member_data['job'], $key_crew_roles)) {
+                $crew_person_key = $crew_member_data['id'] . '-' . $crew_member_data['job'];
+                if (!isset($unique_crew_added[$crew_person_key])) {
+                    $movie_crew_display_list[] = sanitize_text_field($crew_member_data['name']) . " (" . sanitize_text_field($crew_member_data['job']) . ")";
+                    $unique_crew_added[$crew_person_key] = true;
+                }
+            }
+        }
+        // Assumes 'crew' ACF field on movie stores a comma-separated string of key crew names/roles
+        update_field('crew', !empty($movie_crew_display_list) ? implode(', ', $movie_crew_display_list) : '', $movie_post_id);
 
-        // Save the crew's id list on the movie post
-        $crew_names[] = $crew_member['name'];
-        $crew_ids[] = $crew_post_id;
-      }
-    }
-    // Save the actor and crew IDs as a custom field on the movie post
-    update_field('crew', $crew_ids, $movie_post_id); // Text
-    update_field('crew_id', $crew_names, $movie_post_id); // Text
-    update_field('cast', $cast_names, $movie_post_id); // Text
-    update_field('cast_id', $cast_ids, $movie_post_id); // Text
+        // error_log("TMDB Import: Successfully imported movie: {$movie_data['title']} (Post ID: {$movie_post_id})");
 
-  } // <-- This closes the foreach ($movies as $movie)
-} // <-- ADD THIS to close the function import_movie_with_cast
+    } // End foreach movie from discover
+    // error_log("TMDB Import: Movie import process finished.");
+} // End function import_upcoming_movies_and_cast
+
+// Define a custom cron schedule if needed (e.g., twice daily, hourly)
+// add_filter( 'cron_schedules', 'wp_movies_add_cron_intervals' );
+// function wp_movies_add_cron_intervals( $schedules ) {
+//     $schedules['hourly'] = array(
+//         'interval' => 3600,
+//         'display'  => esc_html__( 'Every Hour' ),
+//     );
+//     $schedules['twice_daily'] = array(
+//         'interval' => 43200,
+//         'display'  => esc_html__( 'Twice Daily' ),
+//     );
+//     return $schedules;
+// }
+
+// Schedule the import event if it's not already scheduled
+if ( ! wp_next_scheduled( 'wp_movies_daily_import_hook' ) ) {
+  // You can change 'daily' to 'hourly', 'twicedaily', or your custom interval
+  wp_schedule_event( time(), 'daily', 'wp_movies_daily_import_hook' );
+}
+
+// Hook the import function to our scheduled event
+add_action( 'wp_movies_daily_import_hook', 'import_upcoming_movies_and_cast' );
+
+// Optional: Add a manual trigger for administrators
+add_action('admin_post_nopriv_run_movie_import', 'import_upcoming_movies_and_cast_manual_trigger');
+add_action('admin_post_run_movie_import', 'import_upcoming_movies_and_cast_manual_trigger');
+
+function import_upcoming_movies_and_cast_manual_trigger() {
+    // Optional: Add a capability check if you want to restrict this
+    // if ( !current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }
+    import_upcoming_movies_and_cast();
+    // Optional: Redirect back to an admin page or show a success message
+    // wp_redirect( admin_url( 'edit.php?post_type=movie&import_status=success' ) );
+    // exit;
+    wp_die('Movie import process triggered. Check PHP error logs for details. <a href="'.admin_url('edit.php?post_type=movie').'">Back to movies</a>');
+}
