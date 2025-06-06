@@ -7,7 +7,7 @@
 
 
 <div class="max-w-6xl mx-auto px-4 py-10 bg-white rounded shadow-md mt-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-4">Upcoming Movies</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">🎞️ Upcoming Movies</h2>
     <?php
     // Query next 10 upcoming movies, ordered by release_date ASC
     $args = array(
