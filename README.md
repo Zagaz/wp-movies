@@ -4,12 +4,13 @@
 ##  🔗Live Demo:[ HERE](https://wordpress-hmwhk.wasmer.app/ " HERE")
  WP Movies is a custom WordPress project that displays movie information using data fetched from [The Movie Database (TMDb)](https://www.themoviedb.org/ "The Movie Database (TMDb)"). Built with  PHP and JavaScript (WordPress & WP REST API), it dynamically consumes movie details, including release dates and genres, directly from TMDb.
 
-##Stack
+## Stack
 - PHP
 - TailwindCSS
 - Vanilla JavaScript
+- WordPress
 
-##Theme Installation Guide
+## Theme Installation Guide
 
 #### Step 1 – Install WordPress
 
