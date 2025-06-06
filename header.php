@@ -12,9 +12,11 @@
 <header class="w-full bg-amber-200 shadow rounded-b-lg px-[20px] py-[20px] sm:px-8 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
   <div class="flex flex-row items-center w-full sm:w-auto justify-between">
     <div>
+      
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-800"><?php bloginfo('name'); ?></h1>
       <p class="text-gray-600 text-sm sm:text-base mt-1">Explore your favorite movies and actors</p>
     </div>
+
     <!-- Hamburger Button -->
     <button id="menu-toggle" class="sm:hidden ml-4 p-2 rounded hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Open menu">
       <svg class="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
