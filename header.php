@@ -14,11 +14,7 @@
   <img src = "<?php echo get_theme_file_uri(); ?>/assets/logo.png" alt = "<?php bloginfo('name'); ?>" 
   class=" w-20 h-auto"
   /> 
-
-  
-  
-  <div>
-      
+  <div class="ml-5"> 
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-800"><?php bloginfo('name'); ?></h1>
       <p class="text-gray-600 text-sm sm:text-base mt-1">Explore your favorite movies and actors</p>
     </div>
