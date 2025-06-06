@@ -9,15 +9,15 @@ get_header();
     <form method="get" class="mb-8 flex flex-col md:flex-row md:items-end gap-4">
         <div class="flex-1">
             <label class="block text-gray-700 mb-1" for="filter-title">Title</label>
-            <input type="text" id="filter-title" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by title..." class="border rounded px-3 py-2 w-full">
+            <input type="text" id="filter-title" name="s" value="<?php echo esc_attr(get_query_var('s')); ?>" placeholder="Search by title..." class="border-2 placeholder-gray-500 border rounded px-3 py-2 w-full text-gray-900">
         </div>
         <div class="flex-1">
             <label class="block text-gray-700 mb-1" for="filter-year">Year</label>
-            <input type="text" id="filter-year" name="year" value="<?php echo isset($_GET['year']) ? esc_attr($_GET['year']) : ''; ?>" placeholder="e.g. 2025" class="border rounded px-3 py-2 w-full">
+            <input type="text" id="filter-year" name="year" value="<?php echo isset($_GET['year']) ? esc_attr($_GET['year']) : ''; ?>" placeholder="e.g. 2025" class="border rounded px-3 py-2 w-full placeholder-gray-500 text-gray-900">
         </div>
         <div class="flex-1">
             <label class="block text-gray-700 mb-1" for="filter-genre">Genre</label>
-            <input type="text" id="filter-genre" name="genre" value="<?php echo esc_attr(get_query_var('genre')); ?>" placeholder="e.g. Action" class="border rounded px-3 py-2 w-full">
+            <input type="text" id="filter-genre" name="genre" value="<?php echo esc_attr(get_query_var('genre')); ?>" placeholder="e.g. Action" class="border rounded px-3 py-2 w-full placeholder-gray-500 text-gray-900">
         </div>
         <div class="flex flex-col gap-2">
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Filter</button>
