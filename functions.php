@@ -25,7 +25,8 @@ function import_movie_with_cast($movie_id)
 
 
   // just keep the first 10 movies
-  $movies = array_slice($movies_res, 0, 10);
+  //$movies = array_slice($movies_res, 0, 10);
+  $movies = $movies_res;
 
 
 
