@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
-<h1 class="text-5xl text-cyan-900 font-bold text-center my-10">Hello home</h1>
-<div class="max-w-6xl mx-auto px-4 py-10 bg-white rounded shadow-md">
+
+<div class="max-w-6xl mx-auto px-4 py-10 bg-white rounded shadow-md mt-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-4">Upcoming Movies</h2>
     <?php
     // Query next 10 upcoming movies, ordered by release_date ASC
