@@ -264,19 +264,19 @@ function import_upcoming_movies_and_cast() {
     // error_log("TMDB Import: Movie import process finished.");
 } // End function import_upcoming_movies_and_cast
 
-// Define a custom cron schedule if needed (e.g., twice daily, hourly)
-// add_filter( 'cron_schedules', 'wp_movies_add_cron_intervals' );
-// function wp_movies_add_cron_intervals( $schedules ) {
-//     $schedules['hourly'] = array(
-//         'interval' => 3600,
-//         'display'  => esc_html__( 'Every Hour' ),
-//     );
-//     $schedules['twice_daily'] = array(
-//         'interval' => 43200,
-//         'display'  => esc_html__( 'Twice Daily' ),
-//     );
-//     return $schedules;
-// }
+// Define a custom cron schedule (e.g., weekly)
+add_filter( 'cron_schedules', 'wp_movies_add_cron_intervals' );
+
+function wp_movies_add_cron_intervals( $schedules ) {
+    $schedules['weekly'] = array(
+        'interval' => 604800, // 7 days in seconds (7 * 24 * 60 * 60)
+        'display'  => esc_html__( 'Once Weekly' ),
+    );
+    // You can add more custom schedules here if needed
+    return $schedules;
+}
+
+
 
 // Schedule the import event if it's not already scheduled
 if ( ! wp_next_scheduled( 'wp_movies_daily_import_hook' ) ) {
