@@ -35,8 +35,8 @@ function import_upcoming_movies_with_cast()
 }
 
 add_action('init', function () {
-
-if (isset($_GET['importar']) && $_GET['importar'] === 'filmes') {
+ // <site url>/?import=movies
+  if (isset($_GET['import']) && $_GET['import'] === 'movies') 
     import_upcoming_movies_with_cast();
     $log_time = date('Y-m-d H:i:s');
     error_log("Import completed at {$log_time}\n", 3, plugin_dir_path(__FILE__) . 'import_log.txt');
