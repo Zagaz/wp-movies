@@ -303,6 +303,7 @@ function import_upcoming_movies_and_cast_manual_trigger() {
 
     // Optional: Redirect back to an admin page or show a success message
     // wp_redirect( admin_url( 'edit.php?post_type=movie&import_status=success' ) );
+    
     // exit;
     wp_die('Movie import process triggered. Check PHP error logs for details. <a href="'.admin_url('edit.php?post_type=movie').'">Back to movies</a>');
 }
