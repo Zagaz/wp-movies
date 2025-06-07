@@ -22,7 +22,8 @@ function import_upcoming_movies_and_cast() {
     $api_key = TMDB_API_KEY;
 
     // 1. Fetch list of upcoming movie IDs (or basic data)
-    $discover_url = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=" . date('Y-m-d') . "&language=en-US&sort_by=popularity.desc&api_key={$api_key}";
+    $three_months_from_now = date('Y-m-d', strtotime('+3 months'));
+    $discover_url = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=" . $three_months_from_now . "&language=en-US&sort_by=popularity.desc&api_key={$api_key}";
     $discover_response = wp_remote_get($discover_url);
 
     if (is_wp_error($discover_response) || wp_remote_retrieve_response_code($discover_response) !== 200) {
@@ -258,10 +259,10 @@ function import_upcoming_movies_and_cast() {
         // Assumes 'crew' ACF field on movie stores a comma-separated string of key crew names/roles
         update_field('crew', !empty($movie_crew_display_list) ? implode(', ', $movie_crew_display_list) : '', $movie_post_id);
 
-        // error_log("TMDB Import: Successfully imported movie: {$movie_data['title']} (Post ID: {$movie_post_id})");
+        error_log("TMDB Import: Successfully imported movie: {$movie_data['title']} (Post ID: {$movie_post_id})");
 
     } // End foreach movie from discover
-    // error_log("TMDB Import: Movie import process finished.");
+    error_log("TMDB Import: Movie import process finished.");
 } // End function import_upcoming_movies_and_cast
 
 // Define a custom cron schedule (e.g., weekly)
@@ -279,6 +280,8 @@ function wp_movies_add_cron_intervals( $schedules ) {
 
 
 // Schedule the import event if it's not already scheduled
+// Note: WP-Cron relies on site visits. For precise timing (e.g., exactly at 3:00 AM),
+// consider disabling default WP-Cron and using a server-level cron job to hit /wp-cron.php.
 if ( ! wp_next_scheduled( 'wp_movies_daily_import_hook' ) ) {
   // You can change 'daily' to 'hourly', 'twicedaily', or your custom interval
   wp_schedule_event( time(), 'daily', 'wp_movies_daily_import_hook' );
@@ -287,14 +290,17 @@ if ( ! wp_next_scheduled( 'wp_movies_daily_import_hook' ) ) {
 // Hook the import function to our scheduled event
 add_action( 'wp_movies_daily_import_hook', 'import_upcoming_movies_and_cast' );
 
-// Optional: Add a manual trigger for administrators
-add_action('admin_post_nopriv_run_movie_import', 'import_upcoming_movies_and_cast_manual_trigger');
+// Manual trigger for administrators. Access via: yoursite.com/wp-admin/admin-post.php?action=run_movie_import
 add_action('admin_post_run_movie_import', 'import_upcoming_movies_and_cast_manual_trigger');
 
 function import_upcoming_movies_and_cast_manual_trigger() {
-    // Optional: Add a capability check if you want to restrict this
-    // if ( !current_user_can( 'manage_options' ) ) { wp_die( 'Permission denied.' ); }
+    // Ensure only users who can manage options can run this.
+    if ( !current_user_can( 'manage_options' ) ) {
+        wp_die( 'You do not have sufficient permissions to access this page.' );
+    }
+
     import_upcoming_movies_and_cast();
+
     // Optional: Redirect back to an admin page or show a success message
     // wp_redirect( admin_url( 'edit.php?post_type=movie&import_status=success' ) );
     // exit;
