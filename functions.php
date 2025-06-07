@@ -22,7 +22,8 @@ function import_upcoming_movies_and_cast() {
     $api_key = TMDB_API_KEY;
 
     // 1. Fetch list of upcoming movie IDs (or basic data)
-    $discover_url = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=" . date('Y-m-d') . "&language=en-US&sort_by=popularity.desc&api_key={$api_key}";
+    $three_months_from_now = date('Y-m-d', strtotime('+3 months'));
+    $discover_url = "https://api.themoviedb.org/3/discover/movie?primary_release_date.gte=" . $three_months_from_now . "&language=en-US&sort_by=popularity.desc&api_key={$api_key}";
     $discover_response = wp_remote_get($discover_url);
 
     if (is_wp_error($discover_response) || wp_remote_retrieve_response_code($discover_response) !== 200) {
