@@ -15,7 +15,7 @@
 #### Step 1 – Install WordPress
 
 #### Step 2 – Install and Activate the Theme
-- Use the provided `a.zip` file to install and activate the theme.
+- Download this repo zip file and add this theme to you WordPress instalation.
 
 #### Step 3 – Install the ACF (Advanced Custom Fields) Plugin
 - Make sure the ACF plugin is installed and activated.
