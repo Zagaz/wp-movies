@@ -59,20 +59,20 @@ if (have_posts()) :
     </div>
 
     <div class="video-wrapper mt-8">
-        <p><strong>Alternative Titles:</strong><br> <?php echo esc_html($alternative_titles); ?></p>
+        <p class="text-gray-600"><strong>Alternative Titles:</strong><br> <?php echo esc_html($alternative_titles); ?></p>
         <br>
-        <p><strong>Trailer:</strong></p>
+        <p class="text-gray-600"><strong>Trailer:</strong></p>
         <?php if ($trailer): ?>
             <div class="aspect-w-16 aspect-h-9 w-full max-w-2xl mx-auto">
                 <iframe class="w-full h-64 sm:h-80 rounded" src="https://www.youtube.com/embed/<?php echo esc_html($trailer); ?>" frameborder="0" allowfullscreen></iframe>
             </div>
         <?php else: ?>
-            <p>No trailer available.</p>
+            <p class="text-gray-600">No trailer available.</p>
         <?php endif; ?>
     </div>
 
     <div class="reviews-wrapper mt-10 mb-20">
-        <h1 class="text-2xl font-bold mb-4">Reviews</h1>
+        <h1 class="text-2xl font-bold mb-4 text-gray-900">Reviews</h1>
         <?php
         $review_url = "https://api.themoviedb.org/3/movie/{$tmdb_id}/reviews?language=en-US&page=1&api_key={$api_key}";
         $review_res = json_decode(wp_remote_get($review_url)['body']);
@@ -87,7 +87,7 @@ if (have_posts()) :
             }
         } else {
         ?>
-            <p>No reviews found.</p>
+            <p class="text-gray-600">No reviews found.</p>
         <?php
         }
         ?>
